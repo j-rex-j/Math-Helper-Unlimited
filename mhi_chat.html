@@ -1,0 +1,1167 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MHI Chat</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body{box-sizing:border-box;font-family:'Space Mono',monospace;background:radial-gradient(ellipse at 50% 0%,#0a0e2e 0%,#000 100%);}
+  html,body,#app{height:100%;width:100%;}
+  .cosmic-background{background:linear-gradient(135deg,#0a0e2e 0%,#1a1a3e 25%,#0f0f2e 50%,#1a0f3e 75%,#000 100%);position:relative;overflow:hidden;}
+  .cosmic-stars{position:absolute;width:100%;height:100%;pointer-events:none;}
+  .star{position:absolute;background:radial-gradient(circle,#fff,#aaa);border-radius:50%;animation:twinkle 3s infinite;}
+  @keyframes twinkle{0%,100%{opacity:0.3}50%{opacity:1}}
+  .metallic-panel{background:linear-gradient(135deg,#1a1a3e 0%,#2a2a5e 50%,#1a1a3e 100%);border:2px solid;border-image:linear-gradient(135deg,#00d4ff 0%,#0099ff 50%,#00d4ff 100%) 1;box-shadow:0 0 30px rgba(0,212,255,0.3),inset 0 1px 0 rgba(255,255,255,0.1),inset 0 -1px 0 rgba(0,0,0,0.5);position:relative;}
+  .metallic-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);pointer-events:none;}
+  .metallic-button{background:linear-gradient(180deg,#00d4ff 0%,#0088ff 50%,#0066cc 100%);border:2px solid #00d4ff;box-shadow:0 0 20px rgba(0,212,255,0.5),inset 0 1px 0 rgba(255,255,255,0.3),inset 0 -2px 4px rgba(0,0,0,0.3);text-shadow:0 0 10px rgba(0,212,255,0.5);transition:all 0.3s ease;position:relative;overflow:hidden;}
+  .metallic-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s;}
+  .metallic-button:hover::before{left:100%;}
+  .metallic-button:hover{box-shadow:0 0 30px rgba(0,212,255,0.8),inset 0 1px 0 rgba(255,255,255,0.4),inset 0 -2px 4px rgba(0,0,0,0.2);transform:translateY(-2px);}
+  .metallic-button:active{transform:translateY(0);box-shadow:0 0 15px rgba(0,212,255,0.5),inset 0 2px 4px rgba(0,0,0,0.4);}
+  .metallic-button:disabled{opacity:0.6;transform:none!important;cursor:not-allowed;}
+  .holographic-text{background:linear-gradient(45deg,#00d4ff,#0088ff,#00d4ff);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Orbitron',sans-serif;font-weight:700;animation:shimmer 3s ease-in-out infinite;}
+  @keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .chat-scroll{scrollbar-width:thin;scrollbar-color:#00d4ff #0a0e2e;}
+  .chat-scroll::-webkit-scrollbar{width:8px;}
+  .chat-scroll::-webkit-scrollbar-track{background:#0a0e2e;}
+  .chat-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#00d4ff,#0088ff);border-radius:4px;}
+  @keyframes slideIn{from{opacity:0;transform:translateY(10px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .message-enter{animation:slideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+  @keyframes floatIn{0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}}
+  .header-glow{animation:floatIn 0.6s ease-out;}
+  .cosmic-input{background:linear-gradient(135deg,rgba(26,26,62,0.8),rgba(42,42,94,0.6));border:2px solid rgba(0,212,255,0.3);color:#00d4ff;transition:all 0.3s ease;}
+  .cosmic-input:focus{border-color:#00d4ff;box-shadow:0 0 20px rgba(0,212,255,0.4),inset 0 0 10px rgba(0,212,255,0.1);outline:none;}
+  .cosmic-input::placeholder{color:rgba(0,212,255,0.4);}
+  .energy-bar{background:linear-gradient(90deg,#00d4ff,#0088ff,#00d4ff);background-size:200% 100%;animation:energyFlow 2s ease-in-out infinite;}
+  @keyframes energyFlow{0%,100%{background-position:0% 0%}50%{background-position:100% 0%}}
+  .scanlines{position:relative;overflow:hidden;}
+  .scanlines::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,rgba(0,212,255,0.03),rgba(0,212,255,0.03) 1px,transparent 1px,transparent 2px);pointer-events:none;z-index:9999;}
+  .page{display:none;}.page.active{display:flex;}
+  .danger-button{background:linear-gradient(180deg,#ff4466 0%,#cc0033 50%,#990022 100%);border:2px solid #ff4466;box-shadow:0 0 20px rgba(255,68,102,0.4),inset 0 1px 0 rgba(255,255,255,0.2);transition:all 0.3s ease;position:relative;overflow:hidden;}
+  .danger-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transition:left 0.5s;}
+  .danger-button:hover::before{left:100%;}
+  .danger-button:hover{box-shadow:0 0 30px rgba(255,68,102,0.7);transform:translateY(-1px);}
+  .role-card{transition:all 0.2s ease;}
+  .role-card:hover{box-shadow:0 0 25px rgba(0,212,255,0.4)!important;transform:translateX(4px);}
+  input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:rgba(0,212,255,0.2);border-radius:2px;outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#00d4ff;cursor:pointer;box-shadow:0 0 10px rgba(0,212,255,0.8);}
+  select.cosmic-input option{background:#1a1a3e;color:#00d4ff;}
+  .updates-panel{border-image:linear-gradient(135deg,#ffd700 0%,#ffaa00 50%,#ffd700 100%) 1!important;box-shadow:0 0 30px rgba(255,215,0,0.25),inset 0 1px 0 rgba(255,255,255,0.1)!important;}
+  .reaction-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:0.75rem;font-family:'Space Mono',monospace;border:1px solid rgba(0,212,255,0.3);background:rgba(0,212,255,0.08);color:#00d4ff;cursor:pointer;transition:all 0.15s ease;}
+  .reaction-chip:hover{background:rgba(0,212,255,0.2);border-color:#00d4ff;}
+  .reaction-chip.mine{background:rgba(0,212,255,0.25);border-color:#00d4ff;box-shadow:0 0 8px rgba(0,212,255,0.3);}
+  .emoji-picker-popup{position:absolute;bottom:calc(100% + 8px);left:0;background:linear-gradient(135deg,#1a1a3e,#2a2a5e);border:2px solid #00d4ff;border-radius:12px;box-shadow:0 0 30px rgba(0,212,255,0.4);padding:8px;z-index:100;display:flex;flex-wrap:wrap;gap:4px;max-width:220px;}
+  .emoji-picker-popup button{font-size:1.25rem;padding:4px 6px;border-radius:6px;background:transparent;border:none;cursor:pointer;transition:background 0.1s;}
+  .emoji-picker-popup button:hover{background:rgba(0,212,255,0.2);}
+  .mention-tag{color:#ffd700;font-weight:700;text-shadow:0 0 8px rgba(255,215,0,0.6);}
+  @keyframes mentionPulse{0%,100%{box-shadow:0 0 15px rgba(255,215,0,0.3)}50%{box-shadow:0 0 30px rgba(255,215,0,0.7)}}
+</style>
+</head>
+<body class="m-0 p-0">
+<div id="app" class="w-full h-full cosmic-background scanlines flex flex-col">
+<div class="cosmic-stars" id="cosmic-stars"></div>
+
+<!-- ══ SETUP PAGE (first run) ══ -->
+<div id="page-setup" class="page h-full items-center justify-center p-4">
+  <div class="metallic-panel p-8 w-full max-w-lg">
+    <div class="text-center mb-6"><div class="text-5xl mb-3">🔧</div>
+      <h1 class="text-2xl font-bold holographic-text mb-2">FIREBASE SETUP</h1>
+      <p class="text-cyan-400 text-sm font-mono">Paste your Firebase config below. This is saved locally and never shared.</p>
+    </div>
+    <div class="space-y-3">
+      <div><label class="text-cyan-400 text-xs font-mono font-bold mb-1 block">API KEY</label><input id="cfg-apiKey" class="w-full px-3 py-2 cosmic-input rounded-lg font-mono text-xs" placeholder="AIza..."></div>
+      <div><label class="text-cyan-400 text-xs font-mono font-bold mb-1 block">AUTH DOMAIN</label><input id="cfg-authDomain" class="w-full px-3 py-2 cosmic-input rounded-lg font-mono text-xs" placeholder="your-app.firebaseapp.com"></div>
+      <div><label class="text-cyan-400 text-xs font-mono font-bold mb-1 block">DATABASE URL</label><input id="cfg-databaseURL" class="w-full px-3 py-2 cosmic-input rounded-lg font-mono text-xs" placeholder="https://your-app-default-rtdb.firebaseio.com"></div>
+      <div><label class="text-cyan-400 text-xs font-mono font-bold mb-1 block">PROJECT ID</label><input id="cfg-projectId" class="w-full px-3 py-2 cosmic-input rounded-lg font-mono text-xs" placeholder="your-app"></div>
+      <div><label class="text-cyan-400 text-xs font-mono font-bold mb-1 block">APP ID</label><input id="cfg-appId" class="w-full px-3 py-2 cosmic-input rounded-lg font-mono text-xs" placeholder="1:123456:web:abc..."></div>
+    </div>
+    <p id="setup-error" class="text-orange-400 text-xs font-mono mt-3 hidden"></p>
+    <button onclick="saveConfig()" class="w-full py-3 mt-5 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase">CONNECT</button>
+    <p class="text-cyan-600 text-xs font-mono mt-3 text-center">Find this in Firebase Console → Project Settings → Your apps</p>
+  </div>
+</div>
+
+<!-- ══ AUTH ══ -->
+<div id="page-auth" class="page h-full flex-col">
+  <header class="metallic-panel header-glow px-6 py-4 shrink-0 border-b">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3"><span class="text-4xl">💫</span><h1 class="text-2xl font-bold holographic-text">MHI CHAT</h1></div>
+      <button onclick="clearConfig()" class="text-cyan-600 text-xs font-mono hover:text-cyan-400">⚙ reconfigure</button>
+    </div>
+  </header>
+  <div class="flex-1 overflow-y-auto chat-scroll flex items-center justify-center p-6">
+    <div class="w-full max-w-md metallic-panel p-8">
+      <div id="create-account-form">
+        <div class="mb-6"><div class="flex items-center justify-between mb-3"><span class="text-cyan-400 text-sm font-mono font-bold">PHASE 1 OF 2</span><div class="w-24 h-1 bg-gray-700 rounded-full overflow-hidden"><div class="h-full w-1/2 energy-bar rounded-full"></div></div></div></div>
+        <div class="space-y-5">
+          <div><label class="block text-cyan-400 text-sm font-mono font-bold mb-2">⚙️ IDENTIFIER (username)</label><input type="text" id="reg-username" placeholder="Enter username..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"><p class="text-cyan-300 text-xs mt-2 font-mono">2+ characters.</p><p id="reg-error" class="text-orange-400 text-xs mt-2 hidden font-mono"></p></div>
+          <div><label class="block text-cyan-400 text-sm font-mono font-bold mb-2">🔐 ENCRYPTION KEY (password)</label><input type="password" id="reg-password" placeholder="Enter encryption key..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"><p class="text-cyan-300 text-xs mt-2 font-mono">Minimum 4 characters.</p></div>
+          <div><label class="block text-cyan-400 text-sm font-mono font-bold mb-2">✓ VERIFY KEY</label><input type="password" id="reg-confirm" placeholder="Confirm encryption key..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"></div>
+          <button id="reg-btn" onclick="doRegister()" class="w-full py-3 mt-6 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase tracking-wider">ESTABLISH ACCOUNT</button>
+          <button onclick="switchToLogin()" class="w-full py-2 mt-3 bg-gray-800 hover:bg-gray-700 text-cyan-400 font-mono font-bold rounded-lg transition-all border border-gray-600 text-sm">[EXISTING CREDENTIALS]</button>
+        </div>
+      </div>
+      <div id="login-form" class="hidden">
+        <div class="mb-6"><span class="text-cyan-400 text-sm font-mono font-bold">ACCESS DENIED - RE-AUTHENTICATE</span></div>
+        <div class="space-y-5">
+          <div><label class="block text-cyan-400 text-sm font-mono font-bold mb-2">⚙️ IDENTIFIER</label><input type="text" id="login-username" placeholder="Enter identifier..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"><p id="login-error" class="text-orange-400 text-xs mt-2 hidden font-mono"></p></div>
+          <div><label class="block text-cyan-400 text-sm font-mono font-bold mb-2">🔐 ENCRYPTION KEY</label><input type="password" id="login-password" placeholder="Enter encryption key..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"></div>
+          <button id="login-btn" onclick="doLogin()" class="w-full py-3 mt-6 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase tracking-wider">AUTHENTICATE</button>
+          <button onclick="switchToRegister()" class="w-full py-2 mt-3 bg-gray-800 hover:bg-gray-700 text-cyan-400 font-mono font-bold rounded-lg transition-all border border-gray-600 text-sm">[NEW ACCOUNT]</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ROLE ══ -->
+<div id="page-role" class="page h-full items-center justify-center p-4">
+  <div class="metallic-panel p-8 w-full max-w-md">
+    <div class="text-center mb-6"><div class="text-5xl mb-3">🚀</div><h1 class="text-2xl font-bold holographic-text mb-2">SELECT ROLE</h1><p class="text-cyan-400 text-sm font-mono mb-1">Welcome, <span id="role-username" class="font-bold text-cyan-300"></span></p><p class="text-cyan-500 text-xs font-mono">Choose your operational clearance level</p></div>
+    <div class="space-y-3">
+      <button onclick="selectRole('chatter')" class="role-card w-full p-4 metallic-panel rounded-lg group"><div class="flex items-center gap-3"><span class="text-2xl">💬</span><div class="text-left"><p class="font-bold text-cyan-300 font-mono">CHATTER</p><p class="text-cyan-500 text-xs font-mono">Standard access</p></div></div></button>
+      <button onclick="openModRequestModal()" class="role-card w-full p-4 metallic-panel rounded-lg group"><div class="flex items-center gap-3"><span class="text-2xl">🛡️</span><div class="text-left"><p class="font-bold text-cyan-300 font-mono">MODERATOR</p><p class="text-cyan-500 text-xs font-mono">Requires admin approval</p></div></div></button>
+    </div>
+    <button onclick="doLogout()" class="w-full mt-4 py-2 bg-gray-800 hover:bg-gray-700 text-cyan-400 rounded-lg transition-colors text-sm font-mono font-bold">[← BACK]</button>
+  </div>
+</div>
+
+<!-- ══ CHAT ══ -->
+<div id="page-chat" class="page h-full flex-col">
+  <header class="metallic-panel header-glow px-4 py-3 flex items-center justify-between shrink-0 border-b">
+    <div class="flex items-center gap-3"><span class="text-3xl">💬</span><div><h1 class="text-lg font-bold holographic-text">MHI CHAT</h1><p id="user-role-display" class="text-xs text-cyan-500 font-mono"></p></div></div>
+    <div class="flex items-center gap-2">
+      <button onclick="showRoomsPage()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">🚪 ROOMS</button>
+      <button onclick="showPersonalDashboard()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">📬 NOTIFY</button>
+      <button onclick="showDashboardPage()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">📊 ONLINE</button>
+      <button id="admin-panel-btn" onclick="openAdminPanel()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold hidden">👑 ADMIN</button>
+      <button onclick="showAccountPage()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">👤 PROFILE</button>
+    </div>
+  </header>
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <div id="room-topbar" class="metallic-panel px-4 py-3 flex items-center justify-between shrink-0 border-b">
+      <div><h2 id="room-title" class="text-lg font-bold holographic-text">MAIN CHANNEL</h2><p id="room-description" class="text-xs text-cyan-500 font-mono">General discussion hub</p></div>
+      <button id="manage-room-btn" onclick="openManageRoomModal()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold hidden">⚙️ MANAGE</button>
+    </div>
+    <div id="messages-container" class="flex-1 overflow-y-auto chat-scroll p-4 space-y-3"></div>
+    <div id="image-preview-bar" class="hidden metallic-panel px-4 py-3 border-t flex items-center gap-3">
+      <img id="image-preview-thumb" src="" alt="preview" class="h-16 w-16 object-cover rounded-lg border-2 border-cyan-400">
+      <div class="flex-1"><p id="image-preview-name" class="text-cyan-300 text-xs font-mono truncate"></p><p class="text-cyan-500 text-xs font-mono mt-1">Ready to send</p></div>
+      <button onclick="clearImagePreview()" class="px-3 py-1.5 danger-button text-white text-xs rounded-lg font-mono font-bold">✕ CANCEL</button>
+    </div>
+    <div class="metallic-panel p-4 border-t">
+      <input type="file" id="img-file-input" accept="image/*" class="hidden" onchange="onImageSelected(event)">
+      <div class="flex gap-2">
+        <button id="img-upload-btn" onclick="document.getElementById('img-file-input').click()" class="px-3 py-3 metallic-button text-white font-mono font-bold rounded-lg text-lg shrink-0">🖼️</button>
+        <input type="text" id="msg-input" placeholder="Transmit message..." class="flex-1 px-4 py-3 cosmic-input rounded-lg font-mono text-sm">
+        <button id="send-btn" onclick="sendMessage()" class="px-6 py-3 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase">SEND</button>
+      </div>
+      <p id="readonly-notice" class="text-yellow-400 text-xs font-mono mt-2 hidden text-center">📢 This channel is read-only. Only admins can post here.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ROOMS ══ -->
+<div id="page-rooms" class="page h-full flex-col">
+  <header class="metallic-panel header-glow px-4 py-3 flex items-center justify-between shrink-0 border-b">
+    <div class="flex items-center gap-3"><span class="text-3xl">🚪</span><div><h1 class="text-lg font-bold holographic-text">CHANNEL DIRECTORY</h1><p class="text-xs text-cyan-500 font-mono">Select a channel to join</p></div></div>
+    <button onclick="showChatPage()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">← BACK</button>
+  </header>
+  <div class="flex-1 overflow-y-auto chat-scroll p-6">
+    <div class="max-w-2xl mx-auto space-y-6">
+      <div>
+        <h3 class="text-cyan-400 font-mono font-bold text-sm uppercase tracking-wider mb-3">Public Channels</h3>
+        <div class="space-y-3">
+          <button onclick="switchRoom('main','MAIN CHANNEL','General discussion hub','public')" class="w-full p-4 metallic-panel rounded-lg text-left hover:shadow-lg transition-all"><div class="flex items-center gap-3"><span class="text-xl text-cyan-400">#</span><div><p class="font-bold text-cyan-300 font-mono">main</p><p class="text-cyan-500 text-xs font-mono">General discussion hub</p></div></div></button>
+          <button onclick="switchRoom('mhi-updates','MHI UPDATES','Official announcements — Admin only','updates')" class="w-full p-4 metallic-panel updates-panel rounded-lg text-left hover:shadow-lg transition-all"><div class="flex items-center gap-3"><span class="text-xl">📢</span><div><p class="font-bold text-yellow-300 font-mono">MHI Updates</p><p class="text-yellow-500 text-xs font-mono">Official announcements · read-only for non-admins</p></div></div></button>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-3"><h3 class="text-cyan-400 font-mono font-bold text-sm uppercase tracking-wider">Private Channels</h3><button onclick="openCreateRoomModal()" class="px-3 py-1 metallic-button text-white text-xs rounded-lg font-mono font-bold">➕ CREATE</button></div>
+        <div id="private-rooms-list" class="space-y-3"><p class="text-cyan-500 text-sm py-4 text-center font-mono">No private channels</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="page-dashboard" class="page h-full flex-col">
+  <header class="metallic-panel header-glow px-4 py-3 flex items-center justify-between shrink-0 border-b">
+    <div class="flex items-center gap-3"><span class="text-3xl">📊</span><div><h1 class="text-lg font-bold holographic-text">ONLINE OPERATORS</h1><p class="text-xs text-cyan-500 font-mono">Active in this channel</p></div></div>
+    <button onclick="showChatPage()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">← BACK</button>
+  </header>
+  <div class="flex-1 overflow-y-auto chat-scroll p-6"><div id="dashboard-users-list" class="max-w-2xl mx-auto space-y-3"><p class="text-cyan-500 text-center py-8 font-mono">No operators present</p></div></div>
+</div>
+
+<!-- ══ NOTIFICATIONS ══ -->
+<div id="page-personal-dashboard" class="page h-full flex-col">
+  <header class="metallic-panel header-glow px-4 py-3 flex items-center justify-between shrink-0 border-b">
+    <div class="flex items-center gap-3"><span class="text-3xl">📬</span><div><h1 class="text-lg font-bold holographic-text">PERSONAL DASHBOARD</h1><p class="text-xs text-cyan-500 font-mono">Your notifications</p></div></div>
+    <button onclick="showChatPage()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">← BACK</button>
+  </header>
+  <div class="flex-1 overflow-y-auto chat-scroll p-6"><div id="notifications-list" class="max-w-2xl mx-auto space-y-4"><p class="text-cyan-500 text-center py-8 font-mono">No notifications</p></div></div>
+</div>
+
+<!-- ══ ACCOUNT ══ -->
+<div id="page-account" class="page h-full flex-col">
+  <header class="metallic-panel header-glow px-4 py-3 flex items-center justify-between shrink-0 border-b">
+    <div class="flex items-center gap-3"><span class="text-3xl">👤</span><div><h1 class="text-lg font-bold holographic-text">PROFILE SETTINGS</h1><p class="text-xs text-cyan-500 font-mono">Operator configuration</p></div></div>
+    <button onclick="showChatPage()" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">← BACK</button>
+  </header>
+  <div class="flex-1 overflow-y-auto chat-scroll p-6">
+    <div class="max-w-2xl mx-auto space-y-6">
+      <div><h3 class="text-cyan-400 text-sm font-mono font-bold mb-2">CURRENT IDENTIFIER</h3><p id="account-username" class="text-cyan-300 font-mono px-4 py-3 metallic-panel rounded-lg border"></p></div>
+      <div><h3 class="text-cyan-400 text-sm font-mono font-bold mb-2">YOUR TAG</h3><p id="account-tag" class="text-cyan-300 font-mono px-4 py-3 metallic-panel rounded-lg border"></p></div>
+      <div><h3 class="text-cyan-400 text-sm font-mono font-bold mb-2">CURRENT CLEARANCE</h3><p id="account-role" class="text-cyan-300 font-mono px-4 py-3 metallic-panel rounded-lg border"></p></div>
+      <div class="metallic-panel p-4 rounded-lg">
+        <h3 class="text-cyan-400 text-sm font-mono font-bold mb-3">CHANGE IDENTIFIER</h3>
+        <div class="space-y-2"><input type="text" id="new-username-input" placeholder="New identifier..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"><button onclick="submitChangeUsername()" class="w-full py-2 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase">UPDATE IDENTIFIER</button><p id="change-username-error" class="text-orange-400 text-xs font-mono hidden"></p><p id="change-username-success" class="text-green-400 text-xs font-mono hidden"></p></div>
+      </div>
+      <div class="metallic-panel p-4 rounded-lg">
+        <h3 class="text-cyan-400 text-sm font-mono font-bold mb-3">CHANGE TAG</h3>
+        <div class="space-y-2"><div class="flex items-center gap-2"><span class="text-cyan-400 font-mono font-bold">@</span><input type="text" id="new-tag-input" placeholder="newcoolname" maxlength="20" class="flex-1 px-4 py-3 cosmic-input rounded-lg font-mono text-sm"></div><button onclick="submitChangeTag()" class="w-full py-2 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase">UPDATE TAG</button><p id="change-tag-error" class="text-orange-400 text-xs font-mono hidden"></p><p id="change-tag-success" class="text-green-400 text-xs font-mono hidden"></p></div>
+      </div>
+      <div class="metallic-panel p-4 rounded-lg">
+        <h3 class="text-cyan-400 text-sm font-mono font-bold mb-3">REQUEST MODERATOR</h3>
+        <div id="mod-request-profile-section"><p class="text-cyan-500 text-xs font-mono">Loading...</p></div>
+      </div>
+      <button onclick="doLogout()" class="w-full py-3 bg-red-900/50 hover:bg-red-800/50 text-red-300 font-mono font-bold rounded-lg transition-all border border-red-600 uppercase text-sm">LOGOUT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BANNED ══ -->
+<div id="page-banned" class="page h-full items-center justify-center p-4 overflow-y-auto">
+  <div class="metallic-panel p-8 w-full max-w-md text-center my-auto" style="border-image:linear-gradient(135deg,#ff4466 0%,#cc0033 50%,#ff4466 100%) 1!important;box-shadow:0 0 60px rgba(255,68,102,0.4)!important;">
+    <div class="text-6xl mb-4">🚫</div>
+    <h1 class="text-2xl font-black mb-2" style="font-family:'Orbitron',sans-serif;background:linear-gradient(45deg,#ff4466,#ff0033,#ff4466);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 2s ease-in-out infinite;">YOU'VE BEEN BANNED</h1>
+    <p class="text-red-400 text-xs font-mono mb-1">Account suspended from MHI Chat.</p>
+    <p class="text-cyan-500 text-xs font-mono mb-4">Logged in as: <span id="banned-username-display" class="text-cyan-300 font-bold"></span></p>
+    <div class="metallic-panel rounded-lg p-4 mb-5 text-left" style="border-image:linear-gradient(135deg,#ff4466,#cc0033,#ff4466) 1!important;">
+      <p class="text-red-400 text-xs font-mono font-bold mb-1 uppercase tracking-wider">Reason</p>
+      <p id="ban-reason-display" class="text-red-300 text-sm font-mono">Loading...</p>
+      <p id="ban-type-display" class="text-red-500 text-xs font-mono mt-2"></p>
+    </div>
+    <div id="unban-request-section" class="mb-4 text-left"></div>
+    <button onclick="checkBanStatus()" id="check-ban-btn" class="w-full py-3 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase tracking-wider mb-2">🔍 CHECK IF UNBANNED</button>
+    <p id="ban-check-result" class="text-cyan-400 text-xs font-mono hidden"></p>
+  </div>
+</div>
+</div><!-- end #app -->
+
+<!-- ══ MODALS ══ -->
+<!-- Force Tag -->
+<div id="modal-force-tag" class="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 hidden" style="z-index:200;">
+  <div class="metallic-panel rounded-lg p-8 w-full max-w-sm text-center">
+    <div class="text-5xl mb-4">🏷️</div>
+    <h2 class="text-xl font-bold holographic-text mb-2 font-mono uppercase">SET YOUR TAG</h2>
+    <p class="text-cyan-400 text-sm font-mono mb-6">Every operator needs a unique tag so others can mention you.</p>
+    <div class="text-left mb-4">
+      <label class="block text-cyan-400 text-xs font-mono font-bold mb-2">YOUR TAG</label>
+      <div class="flex items-center gap-2"><span class="text-cyan-400 font-mono font-bold text-lg">@</span><input type="text" id="force-tag-input" placeholder="yourcoolname" maxlength="20" class="flex-1 px-4 py-3 cosmic-input rounded-lg font-mono text-sm" oninput="onForceTagInput()" onkeydown="if(event.key==='Enter')submitForceTag()"></div>
+      <p class="text-cyan-500 text-xs font-mono mt-2">2–20 chars. Letters, numbers, _ and . only.</p>
+      <p id="force-tag-error" class="text-orange-400 text-xs font-mono mt-2 hidden"></p>
+      <p id="force-tag-preview" class="text-cyan-300 text-xs font-mono mt-1 hidden"></p>
+    </div>
+    <button onclick="submitForceTag()" id="force-tag-btn" class="w-full py-3 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase">CONFIRM TAG</button>
+  </div>
+</div>
+<!-- Mod Request -->
+<div id="modal-mod-request" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+  <div class="metallic-panel rounded-lg p-6 w-full max-w-sm">
+    <h2 class="text-xl font-bold holographic-text mb-4 font-mono uppercase">🛡️ Moderator Request</h2>
+    <textarea id="mod-reason-input" rows="4" placeholder="Why should you be a mod?..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm resize-none"></textarea>
+    <div class="flex gap-3 mt-6"><button onclick="closeModal('modal-mod-request')" class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 text-cyan-400 rounded-lg font-mono font-bold">CANCEL</button><button onclick="submitModRequest()" class="flex-1 py-2 metallic-button text-white font-mono font-bold rounded-lg uppercase">SUBMIT</button></div>
+  </div>
+</div>
+<!-- Ban -->
+<div id="modal-ban" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+  <div class="metallic-panel rounded-lg p-6 w-full max-w-sm">
+    <h2 class="text-xl font-bold holographic-text mb-4 font-mono uppercase">🚫 BAN <span id="ban-target-name"></span></h2>
+    <div class="space-y-4 mb-4">
+      <div><label class="text-cyan-400 text-sm font-mono font-bold mb-2 block">BAN TYPE</label><select id="ban-type-select" onchange="onBanTypeChange()" class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"><option value="temporary">⏱️ TEMPORARY (Minutes)</option><option value="permanent">🔒 PERMANENT</option></select></div>
+      <div id="ban-duration-field"><label class="text-cyan-400 text-sm font-mono font-bold mb-2 block">DURATION (MINUTES)</label><input type="range" id="ban-duration" min="1" max="120" value="15" oninput="updateBanSlider()"><div class="flex items-center justify-between p-2 metallic-panel rounded-lg border mt-2"><span class="text-cyan-400 text-sm font-mono">Duration:</span><span id="ban-duration-val" class="text-cyan-300 font-mono font-bold text-lg">15 MINUTES</span></div></div>
+    </div>
+    <label class="text-cyan-400 text-sm font-mono font-bold mb-2 block">BAN REASON (REQUIRED)</label>
+    <textarea id="ban-reason-input" rows="3" placeholder="Reason..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm resize-none mb-2"></textarea>
+    <p id="ban-reason-error" class="text-orange-400 text-xs hidden font-mono mb-2">PROVIDE A REASON</p>
+    <div class="flex gap-3 mt-2"><button onclick="closeModal('modal-ban')" class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 text-cyan-400 rounded-lg font-mono font-bold">CANCEL</button><button onclick="executeBan()" class="flex-1 py-2 danger-button text-white font-mono font-bold rounded-lg uppercase">EXECUTE BAN</button></div>
+  </div>
+</div>
+<!-- Admin Panel -->
+<div id="modal-admin" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+  <div class="metallic-panel w-full max-w-2xl shadow-2xl flex flex-col max-h-[90%] rounded-lg overflow-hidden">
+    <header class="metallic-panel border-b px-6 py-4 flex items-center justify-between shrink-0"><div class="flex items-center gap-3"><span class="text-3xl">👑</span><h1 class="text-lg font-bold holographic-text">ADMIN CONTROL CENTER</h1></div><button onclick="closeModal('modal-admin')" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">✕ CLOSE</button></header>
+    <div id="admin-panel-body" class="flex-1 overflow-y-auto chat-scroll p-6 space-y-8"><p class="text-cyan-500 text-center font-mono">Loading...</p></div>
+  </div>
+</div>
+<!-- Create Room -->
+<div id="modal-create-room" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+  <div class="metallic-panel rounded-lg p-6 w-full max-w-sm">
+    <h2 class="text-xl font-bold holographic-text mb-4 font-mono uppercase">➕ Create Private Room</h2>
+    <div class="space-y-4">
+      <div><label class="text-cyan-400 text-sm font-mono font-bold mb-2 block">ROOM NAME</label><input type="text" id="new-room-name" placeholder="e.g. study-group" class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"><p id="room-name-error" class="text-orange-400 text-xs mt-2 hidden font-mono">ENTER A ROOM NAME</p></div>
+      <div><label class="text-cyan-400 text-sm font-mono font-bold mb-2 block">DESCRIPTION</label><input type="text" id="new-room-desc" placeholder="What's this room for?" class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm"></div>
+    </div>
+    <div class="flex gap-3 mt-6"><button onclick="closeModal('modal-create-room')" class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 text-cyan-400 rounded-lg font-mono font-bold">CANCEL</button><button onclick="submitCreateRoom()" class="flex-1 py-2 metallic-button text-white font-mono font-bold rounded-lg uppercase">CREATE</button></div>
+  </div>
+</div>
+<!-- Manage Room -->
+<div id="modal-manage-room" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+  <div class="metallic-panel rounded-lg p-6 w-full max-w-sm max-h-[90vh] flex flex-col">
+    <h2 class="text-xl font-bold holographic-text mb-1 font-mono uppercase">⚙️ Manage Room</h2>
+    <p id="manage-room-name-display" class="text-cyan-500 text-xs font-mono mb-4"></p>
+    <div class="mb-5 flex-1 overflow-hidden flex flex-col">
+      <label class="text-cyan-400 text-sm font-mono font-bold mb-2 block">SEARCH OR SELECT USER</label>
+      <input type="text" id="invite-search-input" placeholder="Search username..." class="px-4 py-2 cosmic-input rounded-lg font-mono text-sm mb-2" oninput="onInviteSearchChange()">
+      <div id="available-users-list" class="flex-1 overflow-y-auto chat-scroll space-y-1 border border-cyan-400/30 rounded-lg p-2"><p class="text-cyan-500 text-xs font-mono text-center py-2">Loading users...</p></div>
+      <p id="invite-error" class="text-orange-400 text-xs mt-2 hidden font-mono"></p>
+    </div>
+    <div class="mb-5"><label class="text-cyan-400 text-sm font-mono font-bold mb-2 block">CURRENT MEMBERS</label><div id="manage-members-list" class="space-y-2 max-h-32 overflow-y-auto chat-scroll"></div></div>
+    <div id="delete-room-section" class="mb-4 hidden"><button onclick="submitDeleteRoom()" class="w-full py-2 danger-button text-white font-mono font-bold rounded-lg text-xs uppercase">🗑️ DELETE THIS ROOM</button></div>
+    <button onclick="closeModal('modal-manage-room')" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-cyan-400 rounded-lg font-mono font-bold">CLOSE</button>
+  </div>
+</div>
+<!-- Lightbox -->
+<div id="modal-lightbox" class="fixed inset-0 bg-black/95 flex items-center justify-center p-4 hidden z-50" onclick="closeModal('modal-lightbox')">
+  <div class="relative max-w-4xl max-h-full w-full flex flex-col items-center gap-3">
+    <img id="lightbox-img" src="" alt="Full image" class="max-w-full max-h-[80vh] object-contain rounded-lg" style="box-shadow:0 0 60px rgba(0,212,255,0.4);">
+    <p class="text-cyan-500 text-xs font-mono">Click anywhere to close</p>
+  </div>
+</div>
+<div id="toast" class="fixed bottom-4 right-4 metallic-panel text-cyan-300 px-4 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 font-mono font-bold max-w-sm border"></div>
+
+<!-- ══ FIREBASE SDK ══ -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, set, get, push, onValue, off, remove, update, query, orderByChild, limitToLast, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+// ══ STARS ══
+(function(){const c=document.getElementById('cosmic-stars');for(let i=0;i<100;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*2+'px';s.style.cssText=`width:${sz};height:${sz};left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s`;c.appendChild(s);}})();
+
+// ══ STATE ══
+let db = null;
+let currentUser = null;
+let currentRole = 'chatter';
+let currentTag  = '';
+let tagMap      = {};
+let currentRoom = 'main';
+let currentRoomTitle = 'MAIN CHANNEL';
+let currentRoomDesc  = 'General discussion hub';
+let currentRoomType  = 'public';
+let currentRoomObj   = null;
+let allRooms         = [];
+let banTargetUser    = null;
+let manageRoomObj    = null;
+let stagedImage      = null;
+let msgListener      = null;
+let roomsListener    = null;
+let roleListener     = null;
+let allSystemUsers   = [];
+let currentPickerMsgId = null;
+const QUICK_EMOJIS = ['👍','❤️','😂','😮','😢','🔥','💯','👀','🎉','✅','💀','😭','🙏','⚡','🤔'];
+const BAD_WORDS = ['hell','damn','crap','piss','ass','bastard','bitch','shit','fuck','dammit','asshole'];
+
+// ══ FIREBASE CONFIG ══
+function loadConfig(){try{const s=localStorage.getItem('mhi_fb_config');return s?JSON.parse(s):null;}catch(_){return null;}}
+function saveConfig(){
+  const cfg={apiKey:v('cfg-apiKey'),authDomain:v('cfg-authDomain'),databaseURL:v('cfg-databaseURL'),projectId:v('cfg-projectId'),appId:v('cfg-appId')};
+  if(!cfg.apiKey||!cfg.databaseURL){document.getElementById('setup-error').textContent='API KEY and DATABASE URL are required.';document.getElementById('setup-error').classList.remove('hidden');return;}
+  try{localStorage.setItem('mhi_fb_config',JSON.stringify(cfg));initFirebase(cfg);}
+  catch(e){document.getElementById('setup-error').textContent='Error: '+e.message;document.getElementById('setup-error').classList.remove('hidden');}
+}
+window.saveConfig=saveConfig;
+function clearConfig(){localStorage.removeItem('mhi_fb_config');localStorage.removeItem('mhi_session');showPage('page-setup');}
+window.clearConfig=clearConfig;
+
+function initFirebase(cfg){
+  try{
+    const app=initializeApp(cfg);
+    db=getDatabase(app);
+    // Test connection
+    get(ref(db,'_ping')).then(()=>{
+      showPage('page-auth');
+      const sess=loadSession();
+      if(sess.user){currentUser=sess.user;currentRole=sess.role||'chatter';enterChat();}
+    }).catch(e=>{
+      document.getElementById('setup-error').textContent='Connection failed: '+e.message;
+      document.getElementById('setup-error').classList.remove('hidden');
+      showPage('page-setup');
+    });
+  }catch(e){document.getElementById('setup-error').textContent='Init failed: '+e.message;document.getElementById('setup-error').classList.remove('hidden');}
+}
+
+// ══ SESSION ══
+function saveSession(u,r){try{localStorage.setItem('mhi_session',JSON.stringify({user:u,role:r}));}catch(_){}}
+function loadSession(){try{const s=localStorage.getItem('mhi_session');return s?JSON.parse(s):{user:null,role:null};}catch(_){return{user:null,role:null};}}
+function clearSession(){try{localStorage.removeItem('mhi_session');}catch(_){}}
+
+// ══ UTILS ══
+function v(id){return document.getElementById(id).value.trim();}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function fmtTime(ts){try{return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}catch(_){return '';}}
+function genId(){return Date.now().toString(36)+'_'+Math.random().toString(36).substr(2,6);}
+function hashPw(pw,salt){let h=0;const s=pw+salt;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h=h&h;}return Math.abs(h).toString(16);}
+function censor(t){BAD_WORDS.forEach(w=>{t=t.replace(new RegExp(`\\b${w}\\b`,'gi'),'♡'.repeat(w.length));});return t;}
+
+let toastTimer;
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.remove('translate-y-20','opacity-0');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.add('translate-y-20','opacity-0'),3200);}
+window.showToast=showToast;
+
+// ══ PAGES ══
+const ALL_PAGES=['page-setup','page-auth','page-role','page-chat','page-rooms','page-dashboard','page-personal-dashboard','page-account','page-banned'];
+function showPage(id){ALL_PAGES.forEach(p=>{const el=document.getElementById(p);el.classList.remove('active');el.classList.add('hidden');});const t=document.getElementById(id);t.classList.remove('hidden');t.classList.add('active');}
+window.showChatPage=()=>showPage('page-chat');
+window.showRoomsPage=()=>{loadRooms();showPage('page-rooms');};
+window.showDashboardPage=()=>{loadDashboard();showPage('page-dashboard');};
+window.showPersonalDashboard=()=>{loadPersonalDashboard();showPage('page-personal-dashboard');};
+window.showAccountPage=async()=>{
+  document.getElementById('account-username').textContent=currentUser;
+  document.getElementById('account-tag').textContent=currentTag?'@'+currentTag:'(no tag set)';
+  const labels={admin:'👑 ADMIN',mod:'🛡️ MODERATOR',chatter:'💬 CHATTER'};
+  document.getElementById('account-role').textContent=labels[currentRole]||currentRole.toUpperCase();
+  document.getElementById('new-tag-input').value='';
+  document.getElementById('change-username-error').classList.add('hidden');
+  document.getElementById('change-username-success').classList.add('hidden');
+  document.getElementById('change-tag-error').classList.add('hidden');
+  document.getElementById('change-tag-success').classList.add('hidden');
+  await renderModRequestSection();
+  showPage('page-account');
+};
+
+function openModal(id){document.getElementById(id).classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+window.closeModal=closeModal;
+
+// ══ AUTH ══
+window.switchToLogin=()=>{document.getElementById('create-account-form').classList.add('hidden');document.getElementById('login-form').classList.remove('hidden');};
+window.switchToRegister=()=>{document.getElementById('login-form').classList.add('hidden');document.getElementById('create-account-form').classList.remove('hidden');};
+function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.classList.remove('hidden');}
+function hideErr(id){document.getElementById(id).classList.add('hidden');}
+
+window.doRegister=async()=>{
+  hideErr('reg-error');
+  const username=v('reg-username'),password=document.getElementById('reg-password').value,confirm=document.getElementById('reg-confirm').value;
+  if(username.length<2)return showErr('reg-error','IDENTIFIER TOO SHORT');
+  if(password.length<4)return showErr('reg-error','KEY TOO SHORT');
+  if(password!==confirm)return showErr('reg-error','KEYS DO NOT MATCH');
+  const btn=document.getElementById('reg-btn');btn.disabled=true;btn.textContent='ESTABLISHING...';
+  try{
+    // Check username taken
+    const snap=await get(ref(db,'accounts'));
+    if(snap.exists()){
+      const accounts=snap.val();
+      for(const uid in accounts){if(accounts[uid].username===username){showErr('reg-error','IDENTIFIER IN USE');return;}}
+    }
+    // Check banned
+    const banSnap=await get(ref(db,'bans/'+username));
+    if(banSnap.exists()&&isActiveBan(banSnap.val())){currentUser=username;showBannedPage();return;}
+    const salt=Math.random().toString(36).substr(2,12);
+    const hash=hashPw(password,salt);
+    const uid=genId();
+    await set(ref(db,'accounts/'+uid),{username,password_hash:hash,password_salt:salt,role:'chatter',tag:'',timestamp:Date.now()});
+    currentUser=username;currentRole='chatter';
+    document.getElementById('role-username').textContent=username;
+    showPage('page-role');
+  }catch(e){showErr('reg-error','ERROR: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='ESTABLISH ACCOUNT';}
+};
+
+window.doLogin=async()=>{
+  hideErr('login-error');
+  const username=v('login-username'),password=document.getElementById('login-password').value;
+  if(!username)return showErr('login-error','ENTER IDENTIFIER');
+  if(!password)return showErr('login-error','ENTER KEY');
+  const btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='AUTHENTICATING...';
+  try{
+    const snap=await get(ref(db,'accounts'));
+    if(!snap.exists())return showErr('login-error','IDENTIFIER NOT FOUND');
+    const accounts=snap.val();
+    let found=null;
+    for(const uid in accounts){if(accounts[uid].username===username){found={uid,...accounts[uid]};break;}}
+    if(!found)return showErr('login-error','IDENTIFIER NOT FOUND');
+    if(hashPw(password,found.password_salt)!==found.password_hash)return showErr('login-error','INVALID KEY');
+    // Check banned
+    const banSnap=await get(ref(db,'bans/'+username));
+    if(banSnap.exists()&&isActiveBan(banSnap.val())){currentUser=username;currentRole=found.role||'chatter';showBannedPage();return;}
+    currentUser=username;currentRole=found.role||'chatter';
+    document.getElementById('role-username').textContent=username;
+    showPage('page-role');
+  }catch(e){showErr('login-error','ERROR: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='AUTHENTICATE';}
+};
+
+// ══ BAN HELPERS ══
+function isActiveBan(banData){
+  if(!banData)return false;
+  if(banData.type==='permanent')return true;
+  if(banData.until&&banData.until>Date.now())return true;
+  return false;
+}
+
+// ══ ROLE ══
+window.selectRole=async(role)=>{currentRole=role;await enterChat();};
+window.openModRequestModal=()=>{document.getElementById('mod-reason-input').value='';openModal('modal-mod-request');};
+window.submitModRequest=async()=>{
+  const reason=document.getElementById('mod-reason-input').value.trim();
+  if(reason.length<5)return showToast('REASON TOO SHORT');
+  const snap=await get(ref(db,'mod_requests/'+currentUser));
+  if(snap.exists())return showToast('REQUEST ALREADY PENDING');
+  await set(ref(db,'mod_requests/'+currentUser),{username:currentUser,reason,timestamp:Date.now()});
+  closeModal('modal-mod-request');showToast('MOD REQUEST SUBMITTED');currentRole='chatter';await enterChat();
+};
+
+async function renderModRequestSection(){
+  const section=document.getElementById('mod-request-profile-section');
+  if(currentRole==='admin'){section.innerHTML='<p class="text-cyan-500 text-xs font-mono">Role managed via Firebase console.</p>';return;}
+  if(currentRole==='mod'){section.innerHTML='<p class="text-green-400 text-xs font-mono">✓ You are already a moderator.</p>';return;}
+  const snap=await get(ref(db,'mod_requests/'+currentUser));
+  if(snap.exists()){section.innerHTML='<p class="text-yellow-400 text-xs font-mono">⏳ Your mod request is pending admin review.</p>';}
+  else{section.innerHTML=`<div class="space-y-2"><p class="text-cyan-500 text-xs font-mono mb-2">Tell us why you should be a moderator:</p><textarea id="profile-mod-reason" rows="3" placeholder="Your reason..." class="w-full px-4 py-3 cosmic-input rounded-lg font-mono text-sm resize-none"></textarea><button onclick="submitProfileModRequest()" class="w-full py-2 metallic-button text-white font-mono font-bold rounded-lg text-sm uppercase">SUBMIT MOD REQUEST</button><p id="profile-mod-error" class="text-orange-400 text-xs font-mono hidden"></p><p id="profile-mod-success" class="text-green-400 text-xs font-mono hidden"></p></div>`;}
+}
+
+window.submitProfileModRequest=async()=>{
+  const reason=document.getElementById('profile-mod-reason').value.trim();
+  const errEl=document.getElementById('profile-mod-error'),okEl=document.getElementById('profile-mod-success');
+  errEl.classList.add('hidden');okEl.classList.add('hidden');
+  if(reason.length<5){errEl.textContent='REASON TOO SHORT';errEl.classList.remove('hidden');return;}
+  const snap=await get(ref(db,'mod_requests/'+currentUser));
+  if(snap.exists()){errEl.textContent='ALREADY PENDING';errEl.classList.remove('hidden');return;}
+  await set(ref(db,'mod_requests/'+currentUser),{username:currentUser,reason,timestamp:Date.now()});
+  okEl.textContent='✓ REQUEST SUBMITTED';okEl.classList.remove('hidden');
+  setTimeout(()=>renderModRequestSection(),1500);
+};
+
+// ══ ENTER CHAT ══
+async function enterChat(){
+  // Check ban
+  const banSnap=await get(ref(db,'bans/'+currentUser));
+  if(banSnap.exists()&&isActiveBan(banSnap.val())){showBannedPage();return;}
+  saveSession(currentUser,currentRole);
+
+  // Load own tag
+  const snap=await get(ref(db,'accounts'));
+  if(snap.exists()){
+    const accounts=snap.val();
+    for(const uid in accounts){
+      if(accounts[uid].username===currentUser){
+        currentTag=accounts[uid].tag||'';
+        // Also refresh role from DB
+        const dbRole=accounts[uid].role||'chatter';
+        if(dbRole!==currentRole){currentRole=dbRole;saveSession(currentUser,currentRole);}
+        break;
+      }
+    }
+    // Build tagMap
+    tagMap={};
+    for(const uid in accounts){const a=accounts[uid];if(a.tag)tagMap[a.username]=a.tag;}
+  }
+
+  const roleLabels={admin:'👑 ADMIN MODE',mod:'🛡️ MODERATOR',chatter:'💬 CHATTER'};
+  document.getElementById('user-role-display').textContent=`[${roleLabels[currentRole]}] ${currentUser}`;
+  document.getElementById('admin-panel-btn').classList.toggle('hidden',currentRole!=='admin');
+
+  switchRoom('main','MAIN CHANNEL','General discussion hub','public');
+  showPage('page-chat');
+  loadRooms();
+  startRoleWatcher();
+
+  if(!currentTag){
+    document.getElementById('force-tag-input').value='';
+    document.getElementById('force-tag-error').classList.add('hidden');
+    document.getElementById('force-tag-preview').classList.add('hidden');
+    document.getElementById('modal-force-tag').classList.remove('hidden');
+  }
+}
+
+// Watch role changes from Firebase in real time
+function startRoleWatcher(){
+  if(roleListener){off(roleListener);}
+  get(ref(db,'accounts')).then(snap=>{
+    if(!snap.exists())return;
+    const accounts=snap.val();
+    for(const uid in accounts){
+      if(accounts[uid].username===currentUser){
+        roleListener=ref(db,'accounts/'+uid+'/role');
+        onValue(roleListener,snapshot=>{
+          const newRole=snapshot.val();
+          if(newRole&&newRole!==currentRole){
+            currentRole=newRole;saveSession(currentUser,currentRole);
+            const roleLabels={admin:'👑 ADMIN MODE',mod:'🛡️ MODERATOR',chatter:'💬 CHATTER'};
+            document.getElementById('user-role-display').textContent=`[${roleLabels[currentRole]}] ${currentUser}`;
+            document.getElementById('admin-panel-btn').classList.toggle('hidden',currentRole!=='admin');
+            showToast('YOUR ROLE HAS BEEN UPDATED TO '+currentRole.toUpperCase());
+          }
+        });
+        break;
+      }
+    }
+  });
+}
+
+// ══ ROOMS ══
+window.switchRoom=function switchRoom(roomId,title,desc,type,roomObj){
+  currentRoom=roomId;currentRoomTitle=title;currentRoomDesc=desc;currentRoomType=type||'public';currentRoomObj=roomObj||null;
+  document.getElementById('room-title').textContent=title;
+  document.getElementById('room-description').textContent=desc;
+  const topbar=document.getElementById('room-topbar');
+  topbar.classList.toggle('updates-panel',currentRoomType==='updates');
+  const isReadOnly=currentRoomType==='updates'&&currentRole!=='admin';
+  document.getElementById('msg-input').disabled=isReadOnly;
+  document.getElementById('send-btn').disabled=isReadOnly;
+  document.getElementById('img-upload-btn').disabled=isReadOnly;
+  document.getElementById('readonly-notice').classList.toggle('hidden',!isReadOnly);
+  const canManage=currentRoomType==='private'&&(currentRole==='admin'||(roomObj&&roomObj.owner===currentUser));
+  document.getElementById('manage-room-btn').classList.toggle('hidden',!canManage);
+  document.getElementById('messages-container').innerHTML='';
+  document.querySelectorAll('.emoji-picker-popup').forEach(p=>p.remove());currentPickerMsgId=null;
+  showPage('page-chat');
+  startMessageListener(roomId);
+};
+
+function startMessageListener(roomId){
+  if(msgListener){off(msgListener);}
+  const msgRef=query(ref(db,'messages/'+roomId),orderByChild('timestamp'),limitToLast(100));
+  msgListener=msgRef;
+  onValue(msgRef,snapshot=>{
+    const container=document.getElementById('messages-container');
+    if(!snapshot.exists()){container.innerHTML='';return;}
+    const msgs=Object.entries(snapshot.val()).map(([k,v])=>({id:k,...v})).sort((a,b)=>a.timestamp-b.timestamp);
+    // Rebuild messages (Firebase real-time handles everything)
+    const existingIds=new Set([...container.querySelectorAll('[data-msg-id]')].map(el=>el.dataset.msgId));
+    const wasAtBottom=container.scrollHeight-container.scrollTop-container.clientHeight<80;
+    msgs.forEach(msg=>{
+      if(existingIds.has(msg.id))return;
+      appendMessage(msg,container);
+    });
+    // Remove deleted messages
+    const currentIds=new Set(msgs.map(m=>m.id));
+    container.querySelectorAll('[data-msg-id]').forEach(el=>{if(!currentIds.has(el.dataset.msgId))el.remove();});
+    if(wasAtBottom)container.scrollTop=container.scrollHeight;
+  });
+  // Also listen for reactions
+  onValue(ref(db,'reactions/'+roomId),snapshot=>{
+    const data=snapshot.exists()?snapshot.val():{};
+    renderAllReactions(data);
+  });
+}
+
+async function loadRooms(){
+  const snap=await get(ref(db,'rooms'));
+  allRooms=[];
+  if(snap.exists()){
+    const rooms=snap.val();
+    for(const id in rooms){
+      const r={id,...rooms[id]};
+      r.members=r.members?r.members.split(',').filter(m=>m):[];
+      allRooms.push(r);
+    }
+  }
+  renderPrivateRooms();
+}
+
+function renderPrivateRooms(){
+  const list=document.getElementById('private-rooms-list');
+  const myRooms=allRooms.filter(r=>currentRole==='admin'||r.owner===currentUser||r.members.includes(currentUser));
+  if(!myRooms.length){list.innerHTML='<p class="text-cyan-500 text-sm py-4 text-center font-mono">No private channels</p>';return;}
+  list.innerHTML=myRooms.map(r=>`<button onclick='window.switchRoom(${JSON.stringify(r.id)},${JSON.stringify(r.name)},${JSON.stringify(r.description||"")},"private",${JSON.stringify(r)})' class="w-full p-4 metallic-panel rounded-lg text-left hover:shadow-lg transition-all"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><span class="text-xl">🔒</span><div><p class="font-bold text-cyan-300 font-mono">${esc(r.name)}</p><p class="text-cyan-500 text-xs font-mono">${esc(r.description||'')}</p></div></div><span class="text-cyan-500 text-xs font-mono">${r.members.length} members</span></div></button>`).join('');
+}
+
+window.openCreateRoomModal=()=>{document.getElementById('new-room-name').value='';document.getElementById('new-room-desc').value='';document.getElementById('room-name-error').classList.add('hidden');openModal('modal-create-room');};
+window.submitCreateRoom=async()=>{
+  const name=v('new-room-name'),desc=v('new-room-desc');
+  if(!name){document.getElementById('room-name-error').classList.remove('hidden');return;}
+  const id=genId();
+  await set(ref(db,'rooms/'+id),{name,description:desc,owner:currentUser,members:'',timestamp:Date.now()});
+  closeModal('modal-create-room');showToast('ROOM CREATED');await loadRooms();
+};
+
+// ══ MANAGE ROOM ══
+window.openManageRoomModal=()=>{
+  if(!currentRoomObj)return;
+  manageRoomObj={...currentRoomObj};
+  document.getElementById('manage-room-name-display').textContent='Room: '+manageRoomObj.name;
+  document.getElementById('invite-search-input').value='';
+  document.getElementById('invite-error').classList.add('hidden');
+  document.getElementById('delete-room-section').classList.toggle('hidden',!(currentRole==='admin'||manageRoomObj.owner===currentUser));
+  renderManageMembers();
+  loadAvailableUsers();
+  openModal('modal-manage-room');
+};
+
+async function loadAvailableUsers(){
+  const snap=await get(ref(db,'accounts'));
+  allSystemUsers=[];
+  if(snap.exists()){
+    const accounts=snap.val();
+    const memberSet=new Set(manageRoomObj.members||[]);
+    for(const uid in accounts){
+      const a=accounts[uid];
+      if(a.username!==currentUser&&a.username!==manageRoomObj.owner&&!memberSet.has(a.username)){
+        allSystemUsers.push({username:a.username,role:a.role||'chatter'});
+      }
+    }
+  }
+  renderAvailableUsers(allSystemUsers);
+}
+
+window.onInviteSearchChange=()=>{const s=document.getElementById('invite-search-input').value.toLowerCase();renderAvailableUsers(allSystemUsers.filter(u=>u.username.toLowerCase().includes(s)));};
+
+function renderAvailableUsers(users){
+  const list=document.getElementById('available-users-list');
+  if(!users.length){list.innerHTML='<p class="text-cyan-500 text-xs font-mono text-center py-2">No available users</p>';return;}
+  list.innerHTML=users.map(u=>`<button onclick="quickInviteUser('${esc(u.username)}')" class="w-full text-left px-3 py-2 metallic-panel rounded-lg hover:shadow-lg transition-all"><div class="flex items-center justify-between"><span class="text-cyan-300 font-mono text-sm">${esc(u.username)}</span><span class="text-cyan-500 text-xs font-mono">${u.role.toUpperCase()}</span></div></button>`).join('');
+}
+
+window.quickInviteUser=async(username)=>{
+  if(!manageRoomObj.members)manageRoomObj.members=[];
+  if(manageRoomObj.members.includes(username))return showErr('invite-error','ALREADY A MEMBER');
+  manageRoomObj.members.push(username);
+  await update(ref(db,'rooms/'+manageRoomObj.id),{members:manageRoomObj.members.join(',')});
+  // Notification
+  await push(ref(db,'notifications/'+username),{type:'room-invite',title:`You've been invited to ${manageRoomObj.name}!`,message:`${currentUser} added you to "${manageRoomObj.name}"`,roomId:manageRoomObj.id,roomName:manageRoomObj.name,timestamp:Date.now()});
+  showToast(`${username} INVITED`);
+  allSystemUsers=allSystemUsers.filter(u=>u.username!==username);
+  renderManageMembers();renderAvailableUsers(allSystemUsers);await loadRooms();
+};
+
+function renderManageMembers(){
+  const list=document.getElementById('manage-members-list');
+  const members=manageRoomObj.members||[];
+  const owner=manageRoomObj.owner;
+  const canKick=currentRole==='admin'||owner===currentUser;
+  let html=`<div class="flex items-center justify-between px-3 py-2 metallic-panel rounded-lg mb-1"><span class="text-cyan-300 font-mono text-sm">👑 ${esc(owner)}</span><span class="text-yellow-400 text-xs font-mono">OWNER</span></div>`;
+  if(!members.length)html+='<p class="text-cyan-500 text-xs font-mono py-2 text-center">No other members</p>';
+  else members.forEach(m=>{const kb=canKick&&m!==owner?`<button onclick="kickMember('${esc(m)}')" class="px-2 py-1 danger-button text-white text-xs rounded font-mono">KICK</button>`:'';html+=`<div class="flex items-center justify-between px-3 py-2 metallic-panel rounded-lg mb-1"><span class="text-cyan-300 font-mono text-sm">${esc(m)}</span>${kb}</div>`;});
+  list.innerHTML=html;
+}
+
+window.kickMember=async(username)=>{
+  if(!manageRoomObj)return;
+  manageRoomObj.members=(manageRoomObj.members||[]).filter(m=>m!==username);
+  await update(ref(db,'rooms/'+manageRoomObj.id),{members:manageRoomObj.members.join(',')});
+  showToast(`${username} KICKED`);renderManageMembers();await loadRooms();
+};
+
+window.submitDeleteRoom=async()=>{
+  if(!manageRoomObj||!confirm('Delete this room?'))return;
+  await remove(ref(db,'rooms/'+manageRoomObj.id));
+  await remove(ref(db,'messages/'+manageRoomObj.id));
+  closeModal('modal-manage-room');showToast('ROOM DELETED');await loadRooms();
+  switchRoom('main','MAIN CHANNEL','General discussion hub','public');
+};
+
+// ══ MESSAGES ══
+function contentMentionsMe(content){
+  if(!currentTag||!content)return false;
+  const e=currentTag.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return new RegExp('@'+e+'\\b','i').test(content);
+}
+function renderMentions(content){
+  if(!content)return'';
+  const safe=esc(content);
+  const tags=Object.values(tagMap).filter(Boolean).sort((a,b)=>b.length-a.length);
+  if(!tags.length)return safe;
+  const pat=tags.map(t=>'@'+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+  return safe.replace(new RegExp('('+pat+')','gi'),m=>`<span class="mention-tag">${m}</span>`);
+}
+
+function appendMessage(msg,container){
+  const roleColor=msg.role==='admin'?'text-yellow-300':msg.role==='mod'?'text-green-300':'text-cyan-300';
+  const badge=msg.role==='admin'?'<span class="px-2 py-0.5 bg-yellow-600/30 text-yellow-300 text-xs rounded-full font-mono font-bold">ADMIN</span>':msg.role==='mod'?'<span class="px-2 py-0.5 bg-green-600/30 text-green-300 text-xs rounded-full font-mono font-bold">MOD</span>':'<span class="px-2 py-0.5 bg-blue-600/30 text-blue-300 text-xs rounded-full font-mono font-bold">CHATTER</span>';
+  const senderTag=tagMap[msg.username];
+  const tagLine=senderTag?`<span class="text-cyan-600 text-xs font-mono">@${esc(senderTag)}</span>`:'';
+  const isMentioned=contentMentionsMe(msg.content);
+  const canDelete=currentRole==='admin'||currentRole==='mod'||msg.username===currentUser;
+  const canReport=currentRole!=='admin'&&msg.username!==currentUser;
+  const canBan=(currentRole==='admin'||currentRole==='mod')&&msg.username!==currentUser;
+  const reportContent=msg.image_data?'[image]':esc(msg.content||'');
+  const actions=[
+    `<button onclick="toggleEmojiPicker('${esc(msg.id)}',this)" class="px-2 py-1 text-xs bg-gray-800 hover:bg-gray-700 text-cyan-400 rounded font-mono opacity-0 group-hover:opacity-100 transition-opacity">😊</button>`,
+    canReport?`<button onclick="reportMessage('${esc(msg.id)}','${esc(msg.username)}','${reportContent}')" class="px-2 py-1 text-xs bg-gray-800 hover:bg-gray-700 text-cyan-400 rounded font-mono opacity-0 group-hover:opacity-100 transition-opacity">🚩</button>`:'',
+    canBan?`<button onclick="openBanModal('${esc(msg.username)}')" class="px-2 py-1 text-xs bg-red-900/50 hover:bg-red-800/50 text-red-300 rounded font-mono opacity-0 group-hover:opacity-100 transition-opacity">🚫</button>`:'',
+    canDelete?`<button onclick="deleteMsg('${esc(msg.id)}')" class="px-2 py-1 text-xs bg-gray-800 hover:bg-gray-700 text-cyan-400 rounded font-mono opacity-0 group-hover:opacity-100 transition-opacity">🗑️</button>`:''
+  ].join('');
+  const textContent=msg.content?`<p class="text-cyan-200 font-mono text-sm mt-1">${renderMentions(censor(msg.content))}</p>`:'';
+  const imgHtml=msg.image_data?`<img src="${msg.image_data}" alt="img" class="max-w-xs max-h-64 rounded-lg border-2 border-cyan-400/40 hover:border-cyan-400 transition-all mt-2 cursor-pointer" onclick="openLightbox(this.src)" style="box-shadow:0 0 16px rgba(0,212,255,0.2);">`:'';
+  const bubbleStyle=isMentioned?'background:linear-gradient(135deg,#2e2600 0%,#3d3400 50%,#2e2600 100%);border:2px solid #ffd700;box-shadow:0 0 22px rgba(255,215,0,0.4);animation:mentionPulse 2s ease-in-out 3;':'';
+  const el=document.createElement('div');
+  el.className='message-enter flex justify-start group';el.dataset.msgId=msg.id;
+  el.innerHTML=`<div class="max-w-[80%] metallic-panel rounded-lg px-4 py-3 relative" style="${bubbleStyle}"><div class="flex items-center gap-2 flex-wrap"><span class="font-mono font-bold ${roleColor} text-sm">${esc(msg.username)}</span>${tagLine}${badge}<span class="text-cyan-500 text-xs font-mono">${fmtTime(msg.timestamp)}</span><div class="flex gap-1 ml-2">${actions}</div></div>${imgHtml}${textContent}<div id="reactions-${esc(msg.id)}" class="flex flex-wrap gap-1 mt-2"></div></div>`;
+  container.appendChild(el);
+}
+
+window.deleteMsg=async(msgId)=>{
+  await remove(ref(db,'messages/'+currentRoom+'/'+msgId));
+  await remove(ref(db,'reactions/'+currentRoom+'/'+msgId));
+};
+
+window.reportMessage=async(msgId,username,content)=>{
+  const reason=prompt('Reason for report:');if(!reason)return;
+  await push(ref(db,'reports'),{reported_by:currentUser,username,message_content:content,reason,timestamp:Date.now()});
+  showToast('REPORT SUBMITTED');
+};
+
+// ══ SEND MESSAGE ══
+window.sendMessage=async()=>{
+  const input=document.getElementById('msg-input');
+  const caption=input.value.trim();
+  const btn=document.getElementById('send-btn');
+  const imgBtn=document.getElementById('img-upload-btn');
+
+  if(stagedImage){
+    btn.disabled=true;input.disabled=true;imgBtn.disabled=true;btn.textContent='UPLOADING...';
+    showToast('UPLOADING IMAGE...');
+    try{
+      const msgData={username:currentUser,role:currentRole,content:caption,image_data:stagedImage.base64,timestamp:Date.now()};
+      await push(ref(db,'messages/'+currentRoom),msgData);
+      if(currentRoom==='mhi-updates')await notifyAllUsersOfUpdate(caption||'(image)');
+      input.value='';clearImagePreview();
+    }catch(e){showToast('UPLOAD FAILED: '+e.message);}
+    finally{btn.disabled=false;imgBtn.disabled=false;input.disabled=false;btn.textContent='SEND';}
+    return;
+  }
+  if(!caption)return;
+  btn.disabled=true;input.disabled=true;
+  try{
+    await push(ref(db,'messages/'+currentRoom),{username:currentUser,role:currentRole,content:caption,timestamp:Date.now()});
+    if(currentRoom==='mhi-updates')await notifyAllUsersOfUpdate(caption);
+    input.value='';
+  }catch(e){showToast('TRANSMISSION FAILED');}
+  finally{btn.disabled=false;if(!(currentRoomType==='updates'&&currentRole!=='admin')){input.disabled=false;input.focus();}}
+};
+
+document.getElementById('msg-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendMessage();}});
+
+async function notifyAllUsersOfUpdate(preview){
+  const snap=await get(ref(db,'accounts'));if(!snap.exists())return;
+  const accounts=snap.val();
+  const msg=preview.length>80?preview.substring(0,80)+'…':preview;
+  for(const uid in accounts){
+    const a=accounts[uid];
+    if(a.username!==currentUser){
+      await push(ref(db,'notifications/'+a.username),{type:'update',title:'📢 New update from '+currentUser,message:msg,roomId:'mhi-updates',roomName:'MHI Updates',timestamp:Date.now()});
+    }
+  }
+}
+
+// ══ IMAGE HANDLING ══
+window.onImageSelected=(event)=>{
+  const file=event.target.files[0];if(!file)return;
+  if(file.size>2*1024*1024){showToast('IMAGE TOO LARGE (MAX 2MB)');event.target.value='';return;}
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    stagedImage={base64:e.target.result,filename:file.name};
+    document.getElementById('image-preview-thumb').src=e.target.result;
+    document.getElementById('image-preview-name').textContent=`📸 ${file.name} (${(file.size/1024).toFixed(1)}KB)`;
+    document.getElementById('image-preview-bar').classList.remove('hidden');
+    document.getElementById('msg-input').placeholder='Add a caption (optional)...';
+  };
+  reader.readAsDataURL(file);event.target.value='';
+};
+window.clearImagePreview=()=>{
+  stagedImage=null;
+  document.getElementById('image-preview-bar').classList.add('hidden');
+  document.getElementById('image-preview-thumb').src='';
+  document.getElementById('image-preview-name').textContent='';
+  document.getElementById('msg-input').placeholder='Transmit message...';
+};
+window.openLightbox=(url)=>{document.getElementById('lightbox-img').src=url;openModal('modal-lightbox');};
+
+// ══ REACTIONS ══
+window.toggleEmojiPicker=(msgId,btnEl)=>{
+  document.querySelectorAll('.emoji-picker-popup').forEach(p=>p.remove());
+  if(currentPickerMsgId===msgId){currentPickerMsgId=null;return;}
+  currentPickerMsgId=msgId;
+  const picker=document.createElement('div');picker.className='emoji-picker-popup';
+  QUICK_EMOJIS.forEach(emoji=>{const btn=document.createElement('button');btn.textContent=emoji;btn.onclick=(e)=>{e.stopPropagation();picker.remove();currentPickerMsgId=null;doReact(msgId,emoji);};picker.appendChild(btn);});
+  const bubble=btnEl.closest('.metallic-panel, [style*="border"]');if(bubble){bubble.style.position='relative';bubble.appendChild(picker);}
+  setTimeout(()=>{document.addEventListener('click',function h(){picker.remove();currentPickerMsgId=null;document.removeEventListener('click',h);},{once:true});},0);
+};
+
+async function doReact(msgId,emoji){
+  const rxRef=ref(db,'reactions/'+currentRoom+'/'+msgId+'/'+emoji+'/'+currentUser);
+  const snap=await get(rxRef);
+  if(snap.exists())await remove(rxRef);else await set(rxRef,true);
+}
+
+function renderAllReactions(data){
+  // data = { msgId: { emoji: { username: true } } }
+  for(const msgId in data){
+    const container=document.getElementById('reactions-'+msgId);
+    if(!container)continue;
+    container.innerHTML='';
+    for(const emoji in data[msgId]){
+      const users=Object.keys(data[msgId][emoji]);
+      if(!users.length)continue;
+      const isMine=users.includes(currentUser);
+      const chip=document.createElement('button');
+      chip.className='reaction-chip'+(isMine?' mine':'');
+      chip.title=users.join(', ');
+      chip.innerHTML=`${emoji} <span>${users.length}</span>`;
+      chip.onclick=()=>doReact(msgId,emoji);
+      container.appendChild(chip);
+    }
+  }
+}
+
+// ══ BAN ══
+window.openBanModal=(username)=>{
+  banTargetUser=username;
+  document.getElementById('ban-target-name').textContent=username;
+  document.getElementById('ban-type-select').value='temporary';
+  document.getElementById('ban-duration').value=15;
+  document.getElementById('ban-duration-val').textContent='15 MINUTES';
+  document.getElementById('ban-reason-input').value='';
+  document.getElementById('ban-duration-field').style.display='';
+  document.getElementById('ban-reason-error').classList.add('hidden');
+  openModal('modal-ban');
+};
+window.onBanTypeChange=()=>{document.getElementById('ban-duration-field').style.display=document.getElementById('ban-type-select').value==='permanent'?'none':'';};
+window.updateBanSlider=()=>{document.getElementById('ban-duration-val').textContent=document.getElementById('ban-duration').value+' MINUTES';};
+window.executeBan=async()=>{
+  const reason=document.getElementById('ban-reason-input').value.trim();
+  const banType=document.getElementById('ban-type-select').value;
+  const dur=parseInt(document.getElementById('ban-duration').value);
+  if(!reason||reason.length<3){document.getElementById('ban-reason-error').classList.remove('hidden');return;}
+  const banData={type:banType,reason,timestamp:Date.now()};
+  if(banType==='temporary')banData.until=Date.now()+dur*60000;
+  await set(ref(db,'bans/'+banTargetUser),banData);
+  closeModal('modal-ban');showToast(`${banTargetUser} BANNED`);
+};
+
+// ══ ADMIN PANEL ══
+window.openAdminPanel=async()=>{
+  if(currentRole!=='admin'){showToast('ADMIN ACCESS DENIED');return;}
+  openModal('modal-admin');await loadAdminPanel();
+};
+async function loadAdminPanel(){
+  const body=document.getElementById('admin-panel-body');
+  body.innerHTML='<p class="text-cyan-500 text-center font-mono">Loading...</p>';
+  try{
+    const [reportsSnap,modSnap,unbanSnap,bansSnap,accountsSnap]=await Promise.all([
+      get(ref(db,'reports')),get(ref(db,'mod_requests')),get(ref(db,'unban_requests')),
+      get(ref(db,'bans')),get(ref(db,'accounts'))
+    ]);
+    const reports=reportsSnap.exists()?Object.entries(reportsSnap.val()).map(([k,v])=>({id:k,...v})):[];
+    const modRequests=modSnap.exists()?Object.entries(modSnap.val()).map(([k,v])=>({id:k,...v})):[];
+    const unbanRequests=unbanSnap.exists()?Object.entries(unbanSnap.val()).map(([k,v])=>({id:k,...v})):[];
+    const bans=bansSnap.exists()?Object.entries(bansSnap.val()).map(([k,v])=>({id:k,username:k,...v})):[];
+    const accounts=accountsSnap.exists()?Object.values(accountsSnap.val()).filter(a=>a.username!==currentUser):[];
+    body.innerHTML=buildAdminHTML(reports,modRequests,unbanRequests,bans.filter(b=>isActiveBan(b)),accounts);
+  }catch(e){body.innerHTML='<p class="text-cyan-500 text-center font-mono">Error: '+e.message+'</p>';}
+}
+
+function adminCard(h,b,a){return`<div class="metallic-panel rounded-lg p-4 mb-3"><div class="flex items-start justify-between gap-2 mb-2 flex-wrap">${h}</div>${b?`<p class="text-cyan-400 text-xs font-mono italic mb-3">${b}</p>`:''}<div class="flex gap-2 flex-wrap">${a}</div></div>`;}
+function mBtn(l,o){return`<button onclick="${o}" class="px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">${l}</button>`;}
+function dBtn(l,o){return`<button onclick="${o}" class="px-3 py-1.5 danger-button text-white text-xs rounded-lg font-mono font-bold">${l}</button>`;}
+function gBtn(l,o){return`<button onclick="${o}" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-cyan-400 text-xs rounded-lg font-mono font-bold">${l}</button>`;}
+
+function buildAdminHTML(reports,modRequests,unbanRequests,activeBans,accounts){
+  let html='';
+  html+=`<div><h2 class="text-xl font-bold holographic-text mb-4 font-mono uppercase">🚩 REPORTS (${reports.length})</h2>`;
+  html+=reports.length?reports.map(r=>adminCard(`<span class="font-bold text-cyan-300 font-mono">${esc(r.username)}</span><span class="text-cyan-500 text-xs font-mono">by ${esc(r.reported_by)}</span>`,`"${esc(r.message_content)}" — ${esc(r.reason)}`,dBtn('BAN',`adminBan('${esc(r.username)}')`)+gBtn('DISMISS',`adminDeleteReport('${esc(r.id)}')`))).join(''):'<p class="text-cyan-500 text-center py-4 font-mono">No reports</p>';
+  html+='</div>';
+  html+=`<div><h2 class="text-xl font-bold holographic-text mb-4 font-mono uppercase">🛡️ MOD REQUESTS (${modRequests.length})</h2>`;
+  html+=modRequests.length?modRequests.map(r=>adminCard(`<span class="font-bold text-cyan-300 font-mono">${esc(r.username)}</span>`,esc(r.reason),mBtn('APPROVE',`adminApproveModRequest('${esc(r.id)}','${esc(r.username)}')`)+gBtn('DENY',`adminDenyModRequest('${esc(r.id)}')`))).join(''):'<p class="text-cyan-500 text-center py-4 font-mono">No requests</p>';
+  html+='</div>';
+  html+=`<div><h2 class="text-xl font-bold holographic-text mb-4 font-mono uppercase">🔓 UNBAN REQUESTS (${unbanRequests.length})</h2>`;
+  html+=unbanRequests.length?unbanRequests.map(r=>adminCard(`<span class="font-bold text-cyan-300 font-mono">${esc(r.username)}</span>`,esc(r.reason),mBtn('UNBAN',`adminApproveUnban('${esc(r.id)}','${esc(r.username)}')`)+gBtn('DENY',`adminDenyUnban('${esc(r.id)}')`))).join(''):'<p class="text-cyan-500 text-center py-4 font-mono">No requests</p>';
+  html+='</div>';
+  html+=`<div><h2 class="text-xl font-bold holographic-text mb-4 font-mono uppercase">🚫 ACTIVE BANS (${activeBans.length})</h2>`;
+  html+=activeBans.length?activeBans.map(b=>adminCard(`<span class="font-bold text-cyan-300 font-mono">${esc(b.username)}</span><span class="text-orange-400 text-xs font-mono">${b.type==='permanent'?'PERMANENT':'Temporary'}</span>`,esc(b.reason),mBtn('UNBAN',`adminUnban('${esc(b.username)}')`))).join(''):'<p class="text-cyan-500 text-center py-4 font-mono">No bans</p>';
+  html+='</div>';
+  html+=`<div><h2 class="text-xl font-bold holographic-text mb-4 font-mono uppercase">👥 USERS (${accounts.length})</h2>`;
+  html+=accounts.length?accounts.map(a=>adminCard(`<span class="font-bold text-cyan-300 font-mono">${esc(a.username)}</span><span class="text-cyan-500 text-xs font-mono">${(a.role||'chatter').toUpperCase()}</span>`,'',dBtn('BAN',`adminBan('${esc(a.username)}')`))).join(''):'<p class="text-cyan-500 text-center py-4 font-mono">No users</p>';
+  html+='</div>';
+  return html;
+}
+
+window.adminBan=(u)=>{closeModal('modal-admin');openBanModal(u);};
+window.adminDeleteReport=async(id)=>{await remove(ref(db,'reports/'+id));loadAdminPanel();};
+window.adminApproveModRequest=async(id,username)=>{
+  // Find account and update role
+  const snap=await get(ref(db,'accounts'));
+  if(snap.exists()){const accounts=snap.val();for(const uid in accounts){if(accounts[uid].username===username){await update(ref(db,'accounts/'+uid),{role:'mod'});break;}}}
+  await remove(ref(db,'mod_requests/'+username));
+  showToast(`${username} IS NOW A MOD`);loadAdminPanel();
+};
+window.adminDenyModRequest=async(id)=>{await remove(ref(db,'mod_requests/'+id));loadAdminPanel();};
+window.adminApproveUnban=async(id,username)=>{await remove(ref(db,'bans/'+username));await remove(ref(db,'unban_requests/'+id));showToast(`${username} UNBANNED`);loadAdminPanel();};
+window.adminDenyUnban=async(id)=>{await remove(ref(db,'unban_requests/'+id));loadAdminPanel();};
+window.adminUnban=async(username)=>{await remove(ref(db,'bans/'+username));showToast(`${username} UNBANNED`);loadAdminPanel();};
+
+// ══ CHANGE USERNAME ══
+window.submitChangeUsername=async()=>{
+  const newUsername=v('new-username-input');
+  if(newUsername.length<2){showErr('change-username-error','TOO SHORT');return;}
+  hideErr('change-username-error');hideErr('change-username-success');
+  const snap=await get(ref(db,'accounts'));
+  if(!snap.exists())return;
+  const accounts=snap.val();
+  let found=null;
+  for(const uid in accounts){
+    if(accounts[uid].username===newUsername&&accounts[uid].username!==currentUser){showErr('change-username-error','USERNAME TAKEN');return;}
+    if(accounts[uid].username===currentUser)found=uid;
+  }
+  if(!found){showErr('change-username-error','ERROR');return;}
+  await update(ref(db,'accounts/'+found),{username:newUsername});
+  currentUser=newUsername;saveSession(currentUser,currentRole);
+  document.getElementById('change-username-success').textContent='✓ USERNAME CHANGED';document.getElementById('change-username-success').classList.remove('hidden');
+  document.getElementById('new-username-input').value='';
+  setTimeout(()=>window.showAccountPage(),1500);
+};
+
+// ══ TAGS ══
+function cleanTag(raw){return raw.replace(/^@/,'').trim();}
+function validateTagLocal(raw){const t=cleanTag(raw);if(t.length<2)return'TOO SHORT';if(t.length>20)return'TOO LONG';if(!/^[a-zA-Z0-9_.]+$/.test(t))return'ONLY LETTERS, NUMBERS, _ AND . ALLOWED';return null;}
+
+window.onForceTagInput=()=>{
+  const val=document.getElementById('force-tag-input').value;
+  const preEl=document.getElementById('force-tag-preview');
+  const clean=cleanTag(val);
+  document.getElementById('force-tag-error').classList.add('hidden');
+  if(clean.length>0){preEl.textContent='@'+clean;preEl.classList.remove('hidden');}else preEl.classList.add('hidden');
+};
+
+window.submitForceTag=async()=>{
+  const val=document.getElementById('force-tag-input').value;
+  const errEl=document.getElementById('force-tag-error');errEl.classList.add('hidden');
+  const localErr=validateTagLocal(val);if(localErr){errEl.textContent=localErr;errEl.classList.remove('hidden');return;}
+  const btn=document.getElementById('force-tag-btn');btn.disabled=true;btn.textContent='SAVING...';
+  try{
+    const clean=cleanTag(val);
+    // Check uniqueness
+    const snap=await get(ref(db,'accounts'));
+    if(snap.exists()){const accounts=snap.val();for(const uid in accounts){if(accounts[uid].tag&&accounts[uid].tag.toLowerCase()===clean.toLowerCase()&&accounts[uid].username!==currentUser){errEl.textContent='TAG ALREADY TAKEN';errEl.classList.remove('hidden');return;}}}
+    // Set tag
+    if(snap.exists()){const accounts=snap.val();for(const uid in accounts){if(accounts[uid].username===currentUser){await update(ref(db,'accounts/'+uid),{tag:clean});break;}}}
+    currentTag=clean;tagMap[currentUser]=clean;
+    document.getElementById('modal-force-tag').classList.add('hidden');showToast('TAG SET: @'+clean);
+  }catch(e){errEl.textContent='ERROR: '+e.message;errEl.classList.remove('hidden');}
+  finally{btn.disabled=false;btn.textContent='CONFIRM TAG';}
+};
+
+window.submitChangeTag=async()=>{
+  const val=document.getElementById('new-tag-input').value;
+  const errEl=document.getElementById('change-tag-error'),okEl=document.getElementById('change-tag-success');
+  errEl.classList.add('hidden');okEl.classList.add('hidden');
+  const localErr=validateTagLocal(val);if(localErr){errEl.textContent=localErr;errEl.classList.remove('hidden');return;}
+  try{
+    const clean=cleanTag(val);
+    const snap=await get(ref(db,'accounts'));
+    if(snap.exists()){
+      const accounts=snap.val();
+      for(const uid in accounts){if(accounts[uid].tag&&accounts[uid].tag.toLowerCase()===clean.toLowerCase()&&accounts[uid].username!==currentUser){errEl.textContent='TAG ALREADY TAKEN';errEl.classList.remove('hidden');return;}}
+      for(const uid in accounts){if(accounts[uid].username===currentUser){await update(ref(db,'accounts/'+uid),{tag:clean});break;}}
+    }
+    currentTag=clean;tagMap[currentUser]=clean;
+    okEl.textContent='✓ TAG UPDATED TO @'+clean;okEl.classList.remove('hidden');
+    document.getElementById('new-tag-input').value='';
+    setTimeout(()=>window.showAccountPage(),1500);
+  }catch(e){errEl.textContent='ERROR: '+e.message;errEl.classList.remove('hidden');}
+};
+
+// ══ DASHBOARD ══
+window.loadDashboard=async()=>{
+  const list=document.getElementById('dashboard-users-list');
+  list.innerHTML='<p class="text-cyan-500 text-center py-8 font-mono">Loading...</p>';
+  const snap=await get(query(ref(db,'messages/'+currentRoom),orderByChild('timestamp'),limitToLast(200)));
+  if(!snap.exists()){list.innerHTML='<p class="text-cyan-500 text-center py-8 font-mono">No operators present</p>';return;}
+  const seen=new Set(),users=[];
+  Object.values(snap.val()).forEach(m=>{if(!seen.has(m.username)){seen.add(m.username);users.push(m);}});
+  list.innerHTML='<div class="max-w-2xl mx-auto space-y-3">'+users.map(u=>`<div class="metallic-panel rounded-lg p-4 flex items-center gap-3"><span class="text-2xl">${u.role==='admin'?'👑':u.role==='mod'?'🛡️':'💬'}</span><div><p class="font-bold text-cyan-300 font-mono">${esc(u.username)}</p><p class="text-cyan-500 text-xs font-mono">${(u.role||'chatter').toUpperCase()}</p></div></div>`).join('')+'</div>';
+};
+
+// ══ NOTIFICATIONS ══
+window.loadPersonalDashboard=async()=>{
+  const list=document.getElementById('notifications-list');
+  list.innerHTML='<p class="text-cyan-500 text-center py-8 font-mono">Loading...</p>';
+  const snap=await get(ref(db,'notifications/'+currentUser));
+  if(!snap.exists()){list.innerHTML='<p class="text-cyan-500 text-center py-8 font-mono">No notifications</p>';return;}
+  const notifs=Object.entries(snap.val()).map(([k,v])=>({id:k,...v})).sort((a,b)=>b.timestamp-a.timestamp);
+  list.innerHTML=notifs.map(n=>{
+    const icon=n.type==='room-invite'?'🎉':n.type==='update'?'📢':'📬';
+    const actionBtn=n.type==='room-invite'?`<button onclick="window.switchRoom('${esc(n.roomId)}','${esc(n.roomName)}','','private')" class="mt-3 px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">VIEW ROOM</button>`:n.type==='update'?`<button onclick="window.switchRoom('mhi-updates','MHI UPDATES','Official announcements','updates')" class="mt-3 px-3 py-1.5 metallic-button text-white text-xs rounded-lg font-mono font-bold">VIEW UPDATE</button>`:'';
+    return`<div id="notif-${esc(n.id)}" class="metallic-panel rounded-lg p-4"><div class="flex items-start gap-3"><span class="text-2xl">${icon}</span><div class="flex-1 min-w-0"><p class="font-bold text-cyan-300 font-mono text-sm">${esc(n.title)}</p><p class="text-cyan-400 text-xs font-mono mt-1 break-words">${esc(n.message)}</p><p class="text-cyan-500 text-xs font-mono mt-2">${fmtTime(n.timestamp)}</p>${actionBtn}</div><button onclick="deleteNotification('${esc(n.id)}')" class="shrink-0 px-2 py-1 text-xs bg-gray-800 hover:bg-red-900/50 text-cyan-400 hover:text-red-300 rounded font-mono">🗑️</button></div></div>`;
+  }).join('');
+};
+
+window.deleteNotification=async(notifId)=>{
+  await remove(ref(db,'notifications/'+currentUser+'/'+notifId));
+  const el=document.getElementById('notif-'+notifId);if(el)el.remove();
+  const list=document.getElementById('notifications-list');
+  if(list&&!list.querySelector('[id^="notif-"]'))list.innerHTML='<p class="text-cyan-500 text-center py-8 font-mono">No notifications</p>';
+};
+
+// ══ BAN SCREEN ══
+function showBannedPage(){
+  document.getElementById('banned-username-display').textContent=currentUser;
+  document.getElementById('ban-reason-display').textContent='Loading...';
+  document.getElementById('ban-type-display').textContent='';
+  document.getElementById('ban-check-result').classList.add('hidden');
+  document.getElementById('unban-request-section').innerHTML='';
+  showPage('page-banned');
+  loadBanScreen();
+}
+
+async function loadBanScreen(){
+  const snap=await get(ref(db,'bans/'+currentUser));
+  if(snap.exists()){
+    const ban=snap.val();
+    document.getElementById('ban-reason-display').textContent=ban.reason||'No reason provided';
+    document.getElementById('ban-type-display').textContent=ban.type==='permanent'?'🔒 PERMANENT BAN':(ban.until?`⏱️ TEMPORARY — expires ${new Date(ban.until).toLocaleString()}`:'');
+  }else{document.getElementById('ban-reason-display').textContent='No reason provided';}
+  const section=document.getElementById('unban-request-section');
+  const reqSnap=await get(ref(db,'unban_requests/'+currentUser));
+  if(reqSnap.exists()){
+    section.innerHTML='<div class="metallic-panel rounded-lg p-3 text-center" style="border-image:linear-gradient(135deg,#ff4466,#cc0033,#ff4466) 1!important;"><p class="text-yellow-400 text-xs font-mono">⏳ Your unban request is pending admin review.</p></div>';
+  }else{
+    section.innerHTML=`<div class="metallic-panel rounded-lg p-4" style="border-image:linear-gradient(135deg,#ff4466,#cc0033,#ff4466) 1!important;"><p class="text-red-400 text-xs font-mono font-bold mb-2 uppercase">Request Unban</p><textarea id="unban-reason-input" rows="3" placeholder="Explain why you should be unbanned..." class="w-full px-3 py-2 cosmic-input rounded-lg font-mono text-xs resize-none mb-2"></textarea><button onclick="submitUnbanRequest()" class="w-full py-2 metallic-button text-white font-mono font-bold rounded-lg text-xs uppercase">SUBMIT UNBAN REQUEST</button><p id="unban-request-error" class="text-orange-400 text-xs font-mono mt-2 hidden"></p><p id="unban-request-success" class="text-green-400 text-xs font-mono mt-2 hidden"></p></div>`;
+  }
+}
+
+window.submitUnbanRequest=async()=>{
+  const reason=document.getElementById('unban-reason-input').value.trim();
+  const errEl=document.getElementById('unban-request-error'),okEl=document.getElementById('unban-request-success');
+  errEl.classList.add('hidden');okEl.classList.add('hidden');
+  if(reason.length<5){errEl.textContent='REASON TOO SHORT';errEl.classList.remove('hidden');return;}
+  const snap=await get(ref(db,'unban_requests/'+currentUser));
+  if(snap.exists()){errEl.textContent='ALREADY PENDING';errEl.classList.remove('hidden');return;}
+  await set(ref(db,'unban_requests/'+currentUser),{username:currentUser,reason,timestamp:Date.now()});
+  okEl.textContent='✓ REQUEST SUBMITTED';okEl.classList.remove('hidden');
+  setTimeout(()=>loadBanScreen(),1500);
+};
+
+window.checkBanStatus=async()=>{
+  const btn=document.getElementById('check-ban-btn'),result=document.getElementById('ban-check-result');
+  btn.disabled=true;btn.textContent='CHECKING...';result.classList.add('hidden');
+  try{
+    const snap=await get(ref(db,'bans/'+currentUser));
+    if(!snap.exists()||!isActiveBan(snap.val())){
+      clearSession();result.textContent='✅ UNBANNED. Redirecting...';result.classList.remove('hidden');result.style.color='#00ffb2';
+      setTimeout(()=>{showPage('page-role');document.getElementById('role-username').textContent=currentUser;},1500);
+    }else{result.textContent='❌ Still banned.';result.classList.remove('hidden');result.style.color='#ff4466';}
+  }catch(e){result.textContent='⚠️ Error.';result.classList.remove('hidden');result.style.color='#ffd166';}
+  finally{btn.disabled=false;btn.textContent='🔍 CHECK IF UNBANNED';}
+};
+
+// ══ LOGOUT ══
+window.doLogout=()=>{
+  if(msgListener)off(msgListener);if(roomsListener)off(roomsListener);if(roleListener)off(roleListener);
+  currentUser=null;currentRole='chatter';clearSession();
+  document.getElementById('messages-container').innerHTML='';
+  closeModal('modal-admin');showPage('page-auth');window.switchToRegister();
+};
+
+// ══ INIT ══
+const cfg=loadConfig();
+if(cfg){initFirebase(cfg);}
+else{showPage('page-setup');}
+
+</script>
+</body>
+</html>

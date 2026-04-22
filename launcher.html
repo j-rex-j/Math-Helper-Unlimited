@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Helper Games</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Exo+2:wght@300;400;700&amp;display=swap" rel="stylesheet">
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+
+    :root {
+      --bg-color: #0a0a1a;
+      --text-color: #e0e8ff;
+      --accent-color: #00d4ff;
+      --glow-color: #7b2fff;
+      --surface-color: #141428;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background: #000;
+      font-family: 'Orbitron', sans-serif;
+      color: #e8f7ff;
+    }
+
+    /* ===== ANIMATED SPACE BACKGROUND ===== */
+    .space-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, #0a0a1a 0%, #050510 50%, #000000 100%);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .stars-layer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    .nebula {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      mix-blend-mode: screen;
+      animation: nebulaDrift 20s ease-in-out infinite;
+    }
+
+    @keyframes nebulaDrift {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, -50px); }
+    }
+
+    .nebula-purple {
+      background: radial-gradient(circle, rgba(123, 47, 255, 0.8), transparent);
+    }
+
+    .nebula-cyan {
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.6), transparent);
+    }
+
+    .nebula-gold {
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent);
+    }
+
+    /* ===== SPLASH SCREEN ===== */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 1;
+      transition: opacity 0.8s ease-out 3s;
+    }
+
+    #splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes gridPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.7; }
+    }
+
+    .math-symbol {
+      position: absolute;
+      font-family: 'Exo 2', sans-serif;
+      color: var(--accent-color);
+      opacity: 0;
+      animation: floatSymbol 8s ease-in-out infinite;
+      pointer-events: none;
+      font-size: 1.5rem;
+    }
+
+    @keyframes floatSymbol {
+      0% { opacity: 0; transform: translateY(40px) rotate(0deg); }
+      20% { opacity: 0.15; }
+      80% { opacity: 0.15; }
+      100% { opacity: 0; transform: translateY(-200px) rotate(360deg); }
+    }
+
+    .title-line {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .title-main {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      color: var(--text-color);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(100%);
+      animation: slideReveal 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+      text-shadow:
+        0 0 20px rgba(0, 212, 255, 0.4),
+        0 0 60px rgba(123, 47, 255, 0.2);
+      margin: 0;
+    }
+
+    .title-sub {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 400;
+      font-size: clamp(1.8rem, 5vw, 4rem);
+      color: var(--accent-color);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(100%);
+      animation: slideReveal 1s cubic-bezier(0.16, 1, 0.3, 1) 1s forwards;
+      text-shadow:
+        0 0 30px rgba(0, 212, 255, 0.6),
+        0 0 80px rgba(0, 212, 255, 0.3);
+      margin: 0;
+    }
+
+    @keyframes slideReveal {
+      0% { opacity: 0; transform: translateY(100%); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .accent-line {
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-color), var(--glow-color), var(--accent-color), transparent);
+      animation: lineExpand 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+      margin: 1rem 0 2rem;
+    }
+
+    @keyframes lineExpand {
+      0% { width: 0; opacity: 0; }
+      100% { width: min(80%, 500px); opacity: 1; }
+    }
+
+    .image-container {
+      position: relative;
+      opacity: 0;
+      transform: scale(0.8) translateY(30px);
+      animation: imageReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+      max-width: min(85%, 420px);
+      border: none;
+      border-radius: 0;
+      overflow: visible;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    @keyframes imageReveal {
+      0% { opacity: 0; transform: scale(0.8) translateY(30px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .image-container img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 0;
+      background: transparent;
+      border: none;
+    }
+
+    .image-shimmer {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.08) 45%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.08) 55%,
+        transparent 60%
+      );
+      animation: shimmer 3s ease-in-out 3s infinite;
+      pointer-events: none;
+      border-radius: 0;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-150%); }
+      100% { transform: translateX(150%); }
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .image-fallback {
+      width: 100%;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      color: var(--text-color);
+      font-family: 'Exo 2', sans-serif;
+      font-size: 0.9rem;
+      opacity: 0.6;
+    }
+
+    /* ===== GAMES LAUNCHER ===== */
+    #games-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.8s ease-in 3s;
+      overflow-y: auto;
+      z-index: 999;
+    }
+
+    #games-screen.visible {
+      opacity: 1;
+    }
+
+    #games-screen::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(79, 195, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    #games-screen > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #00ffff, #4fc3ff, #ffd700, #00ffff);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmerText 8s ease-in-out infinite;
+      text-shadow: 0 0 30px rgba(79, 195, 255, 0.5);
+      filter: drop-shadow(0 0 15px rgba(79, 195, 255, 0.4)) drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
+    }
+
+    @keyframes shimmerText {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    #nav-tabs {
+      margin-top: 15px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .nav-tab {
+      padding: 10px 20px;
+      border: 2px solid rgba(79, 195, 255, 0.4);
+      background: rgba(11, 15, 26, 0.6);
+      color: #e8f7ff;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+    }
+
+    .nav-tab:hover {
+      border-color: rgba(79, 195, 255, 0.8);
+      box-shadow: 0 0 20px rgba(79, 195, 255, 0.3);
+    }
+
+    .nav-tab.active {
+      border-color: rgba(79, 195, 255, 1);
+      background: linear-gradient(145deg, rgba(79, 195, 255, 0.2), rgba(255, 215, 0, 0.1));
+      box-shadow: 0 0 30px rgba(79, 195, 255, 0.5), 0 0 15px rgba(255, 215, 0, 0.2);
+      color: #00ffff;
+    }
+
+    #count {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      font-size: 14px;
+      color: #4fc3ff;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 5px 10px;
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    #search {
+      margin: 18px auto;
+      max-width: 420px;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(79, 195, 255, 0.4);
+      background: linear-gradient(145deg, rgba(13, 19, 38, 0.8), rgba(6, 9, 19, 0.9));
+      color: white;
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+      box-shadow:
+        inset 0 2px 8px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(79, 195, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    #search::placeholder {
+      color: rgba(232, 247, 255, 0.5);
+    }
+
+    #search:focus {
+      border-color: rgba(79, 195, 255, 0.8);
+      box-shadow:
+        inset 0 2px 8px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(79, 195, 255, 0.4),
+        0 0 20px rgba(255, 215, 0, 0.1);
+      background: linear-gradient(145deg, rgba(13, 19, 38, 0.95), rgba(6, 9, 19, 0.95));
+    }
+
+    #games-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      width: 100%;
+    }
+
+    #games {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      justify-content: center;
+      gap: 22px;
+      margin-top: 20px;
+      padding: 0 10px;
+    }
+
+    .game-btn {
+      width: 180px;
+      height: 180px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 50%),
+                  linear-gradient(145deg, rgba(42, 74, 122, 0.8), rgba(11, 15, 26, 0.9));
+      color: #e8f7ff;
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      overflow: visible;
+      position: relative;
+      box-shadow:
+        inset 0 1px 20px rgba(79, 195, 255, 0.3),
+        inset 0 -2px 15px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(79, 195, 255, 0.3),
+        0 0 60px rgba(255, 215, 0, 0.1),
+        0 20px 40px rgba(0, 0, 0, 0.6);
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border: 2px solid rgba(79, 195, 255, 0.4);
+    }
+
+    .game-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .game-btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 35% 35%, rgba(79, 195, 255, 0.15) 0%, transparent 60%);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .game-btn:hover {
+      transform: translateY(-12px) scale(1.12);
+      box-shadow:
+        inset 0 1px 25px rgba(79, 195, 255, 0.5),
+        inset 0 -2px 15px rgba(0, 0, 0, 0.8),
+        0 0 50px rgba(79, 195, 255, 0.6),
+        0 0 80px rgba(255, 215, 0, 0.25),
+        0 30px 60px rgba(0, 0, 0, 0.8);
+      border-color: rgba(79, 195, 255, 0.8);
+    }
+
+    .game-btn:hover::after {
+      opacity: 1;
+      animation: pulseStar 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulseStar {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.3; }
+    }
+
+    .game-btn:focus {
+      outline: none;
+      box-shadow:
+        inset 0 1px 25px rgba(79, 195, 255, 0.5),
+        inset 0 -2px 15px rgba(0, 0, 0, 0.8),
+        0 0 50px rgba(79, 195, 255, 0.6),
+        0 0 80px rgba(255, 215, 0, 0.25);
+    }
+
+    .game-btn img {
+      width: 80%;
+      height: 80%;
+      object-fit: cover;
+      background: linear-gradient(135deg, #2a4a7a, #0c1224);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      filter: brightness(0.9) contrast(1.1);
+      box-shadow: inset 0 0 20px rgba(79, 195, 255, 0.2);
+      pointer-events: none;
+    }
+
+    .game-btn:hover img {
+      filter: brightness(1.1) contrast(1.2) drop-shadow(0 0 15px rgba(79, 195, 255, 0.4));
+    }
+
+    .game-btn span {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-align: center;
+      padding: 10px;
+      text-shadow: 
+        0 0 10px rgba(79, 195, 255, 0.8),
+        0 0 20px rgba(79, 195, 255, 0.4),
+        0 0 5px rgba(255, 215, 0, 0.3);
+      max-width: 100%;
+      word-wrap: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-grow: 1;
+      display: block;
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      transition: all 0.3s ease-in-out;
+      background: linear-gradient(180deg, transparent 0%, rgba(11, 15, 26, 0.9) 50%, rgba(11, 15, 26, 0.95) 100%);
+      padding-top: 20px;
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    .game-btn:hover span {
+      text-shadow: 
+        0 0 15px rgba(79, 195, 255, 1),
+        0 0 25px rgba(79, 195, 255, 0.6),
+        0 0 8px rgba(255, 215, 0, 0.4);
+    }
+
+    .star-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: linear-gradient(145deg, rgba(255, 215, 0, 0.9), rgba(255, 215, 0, 0.7));
+      color: #000;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5), inset 0 1px 8px rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+      z-index: 5;
+      padding: 0;
+      opacity: 0;
+    }
+
+    .game-btn:hover .star-btn {
+      opacity: 1;
+    }
+
+    .star-btn.favorited {
+      opacity: 1;
+      background: linear-gradient(145deg, #ffed4e, #ffd700);
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.9), inset 0 1px 8px rgba(255, 255, 255, 0.5);
+    }
+
+    .star-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), inset 0 1px 8px rgba(255, 255, 255, 0.3);
+    }
+
+    .star-btn:active {
+      transform: scale(0.95);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.8;
+      padding-top: 20px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(79, 195, 255, 0.3);
+      background: linear-gradient(180deg, transparent, rgba(11, 15, 26, 0.3));
+      padding-bottom: 15px;
+      width: 100%;
+    }
+
+    #empty-state {
+      text-align: center;
+      margin-top: 60px;
+      font-size: 20px;
+      color: rgba(232, 247, 255, 0.6);
+      letter-spacing: 1px;
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+ </head>
+ <body><!-- ANIMATED SPACE BACKGROUND -->
+  <div class="space-background">
+   <div class="stars-layer" id="starsLayer"></div>
+   <div class="nebula nebula-purple" style="width: 400px; height: 400px; top: 10%; left: 5%;"></div>
+   <div class="nebula nebula-cyan" style="width: 300px; height: 300px; top: 60%; right: 10%;"></div>
+   <div class="nebula nebula-gold" style="width: 250px; height: 250px; top: 40%; left: 50%;"></div>
+  </div><!-- SPLASH SCREEN -->
+  <div id="splash-screen">
+   <div class="splash-wrapper">
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div id="mathSymbols" aria-hidden="true"></div>
+    <div id="particles" aria-hidden="true"></div>
+    <div style="text-align: center; position: relative; z-index: 2;">
+     <div class="title-line">
+      <h1 class="title-main" id="titleMain">Math Helper</h1>
+     </div>
+     <div class="title-line">
+      <p class="title-sub" id="titleSub">Infinite</p>
+     </div>
+    </div>
+    <div class="accent-line" aria-hidden="true"></div>
+    <div class="image-container">
+     <img id="heroImage" src="https://drive.google.com/thumbnail?id=1xdw4kmnCV8jy8Dud6jPnP81ZmW0FN3jn&amp;sz=w800" alt="Math Helper Infinite" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.display='none'; document.getElementById('imageFallback').style.display='flex';">
+     <div id="imageFallback" class="image-fallback" style="display: none;"><span>📐 Image could not be loaded</span>
+     </div>
+     <div class="image-shimmer" aria-hidden="true"></div>
+    </div>
+   </div>
+  </div><!-- GAMES LAUNCHER SCREEN -->
+  <div id="games-screen">
+   <header>
+    <h1>🎮 Math Helper Games 🎮</h1>
+    <div id="nav-tabs">
+     <button id="tab-all" class="nav-tab active" onclick="switchTab('all')">All Games</button> <button id="tab-favorites" class="nav-tab" onclick="switchTab('favorites')">⭐ Favorites</button>
+    </div>
+   </header><input id="search" placeholder="Search the galaxy..." oninput="filterGames()">
+   <div id="games-wrapper">
+    <div id="games"></div>
+    <div id="empty-state" style="display: none;">
+     No games found
+    </div>
+   </div>
+   <footer>
+    Forged in orbit by the Math Helper Team
+   </footer>
+   <div id="count">
+    0 games
+   </div>
+  </div>
+  <script>
+    // ===== GENERATE STARS =====
+    function generateStars() {
+      const starsLayer = document.getElementById('starsLayer');
+      for (let i = 0; i < 150; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        starsLayer.appendChild(star);
+      }
+    }
+
+    // ===== SPLASH SCREEN ANIMATION =====
+    function initSplashScreen() {
+      // Generate floating math symbols
+      const symbols = ['∑', '∫', 'π', '∞', '√', 'Δ', '∂', 'λ', 'θ', 'Ω', '±', '≈', '≠', '∝', '∈'];
+      const symbolsContainer = document.getElementById('mathSymbols');
+
+      for (let i = 0; i < 15; i++) {
+        const sym = document.createElement('span');
+        sym.className = 'math-symbol';
+        sym.textContent = symbols[i % symbols.length];
+        sym.style.left = `${5 + Math.random() * 90}%`;
+        sym.style.top = `${60 + Math.random() * 40}%`;
+        sym.style.animationDelay = `${Math.random() * 8}s`;
+        sym.style.animationDuration = `${6 + Math.random() * 6}s`;
+        sym.style.fontSize = `${1 + Math.random() * 1.5}rem`;
+        symbolsContainer.appendChild(sym);
+      }
+
+      // Generate particles
+      const particlesContainer = document.getElementById('particles');
+      const colors = ['#00d4ff', '#7b2fff', '#e0e8ff', '#00ffaa'];
+
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.left = '50%';
+        p.style.top = '40%';
+
+        const angle = (Math.PI * 2 * i) / 30;
+        const distance = 80 + Math.random() * 200;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+        const dur = 1 + Math.random() * 0.5;
+
+        p.animate([
+          { opacity: 0, transform: 'translate(-50%, -50%) scale(0)' },
+          { opacity: 1, transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1)`, offset: 0.3 },
+          { opacity: 0, transform: `translate(calc(-50% + ${tx * 1.5}px), calc(-50% + ${ty * 1.5}px)) scale(0)` }
+        ], {
+          duration: dur * 1000,
+          delay: 800,
+          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          fill: 'forwards'
+        });
+
+        particlesContainer.appendChild(p);
+      }
+
+      // After 3 seconds, transition to games screen
+      setTimeout(() => {
+        document.getElementById('splash-screen').classList.add('hidden');
+        document.getElementById('games-screen').classList.add('visible');
+      }, 3000);
+    }
+
+    // ===== GAMES LAUNCHER CODE =====
+    let allGames = [];
+    let favorites = [];
+    let currentTab = 'all';
+
+    function loadFavorites() {
+      const saved = localStorage.getItem('gamesFavorites');
+      favorites = saved ? JSON.parse(saved) : [];
+    }
+
+    function saveFavorites() {
+      localStorage.setItem('gamesFavorites', JSON.stringify(favorites));
+    }
+
+    function isFavorited(key) {
+      return favorites.some(f => f.key === key);
+    }
+
+    function addFavorite(game) {
+      if (!isFavorited(game.key)) {
+        favorites.push(game);
+        saveFavorites();
+        renderGames(currentTab === 'all' ? filterCurrentGames() : favorites);
+        updateStarButtons();
+      }
+    }
+
+    function removeFavorite(key) {
+      favorites = favorites.filter(f => f.key !== key);
+      saveFavorites();
+      renderGames(currentTab === 'all' ? filterCurrentGames() : favorites);
+      updateStarButtons();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      localStorage.setItem('gamesCurrentTab', tab);
+      document.getElementById('tab-all').classList.toggle('active', tab === 'all');
+      document.getElementById('tab-favorites').classList.toggle('active', tab === 'favorites');
+      document.getElementById('search').style.display = tab === 'all' ? 'block' : 'none';
+      
+      if (tab === 'all') {
+        renderGames(filterCurrentGames());
+      } else {
+        renderGames(favorites);
+      }
+    }
+
+    function gameExists(key) {
+      return allGames.some(g => g.key === key);
+    }
+
+    async function loadGames() {
+      const owner = "beastcooper";
+      const repo = "MHI_games";
+      const branch = "master";
+      const basePath = "offline";
+
+      const api = async (path = "") => {
+        const fullPath = path ? `${basePath}/${path}` : basePath;
+        const res = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contents/${fullPath}?ref=${branch}`
+        );
+        return res.json();
+      };
+
+      try {
+        const items = await api();
+
+        if (!Array.isArray(items)) {
+          console.error("Failed to load games", items);
+          return;
+        }
+
+        for (const item of items) {
+          if (item.type === "file") {
+            const name = item.name.toLowerCase();
+            if (name.endsWith(".html") || name.endsWith(".htm")) {
+              addGame(item.name.replace(/\.(html|htm)$/i, ""), item.download_url);
+            }
+          }
+          if (item.type === "dir") {
+            const files = await api(item.name);
+            const index = files.find(f => {
+              const fname = f.name.toLowerCase();
+              return fname === "index.html" || fname === "index.htm";
+            });
+            if (index) addGame(item.name, index.download_url);
+          }
+        }
+
+        allGames.sort((a, b) => a.name.localeCompare(b.name));
+        renderGames(allGames);
+        document.getElementById("count").textContent = `${allGames.length} games`;
+      } catch (error) {
+        console.error("Error loading games:", error);
+      }
+    }
+
+    function addGame(key, url) {
+      if (gameExists(key)) return;
+      const imageUrl = url.replace(/\.(html|htm)$/, ".png");
+      allGames.push({
+        key,
+        name: key.replace(/[-_]/g, " "),
+        url,
+        image: imageUrl
+      });
+    }
+
+    async function launchGame(url) {
+      const res = await fetch(url);
+      const html = await res.text();
+      const win = window.open("about:blank");
+      win.document.write(html);
+      win.document.close();
+    }
+
+    function filterCurrentGames() {
+      const q = document.getElementById("search").value.toLowerCase();
+      return allGames.filter(g => g.name.toLowerCase().includes(q));
+    }
+
+    function updateStarButtons() {
+      document.querySelectorAll('.star-btn').forEach(btn => {
+        const key = btn.dataset.gameKey;
+        if (isFavorited(key)) {
+          btn.classList.add('favorited');
+          btn.textContent = '★';
+        } else {
+          btn.classList.remove('favorited');
+          btn.textContent = '☆';
+        }
+      });
+    }
+
+    function renderGames(list) {
+      const grid = document.getElementById("games");
+      const emptyState = document.getElementById("empty-state");
+      grid.innerHTML = "";
+
+      if (list.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+
+      list.forEach(game => {
+        const btn = document.createElement("button");
+        btn.className = "game-btn";
+        btn.onclick = () => launchGame(game.url);
+
+        const img = document.createElement("img");
+        img.src = game.image;
+        img.alt = game.name;
+        img.onerror = () => img.style.display = "none";
+
+        const title = document.createElement("span");
+        title.textContent = game.name;
+
+        const starBtn = document.createElement("button");
+        starBtn.className = "star-btn";
+        starBtn.dataset.gameKey = game.key;
+        starBtn.textContent = isFavorited(game.key) ? '★' : '☆';
+        if (isFavorited(game.key)) {
+          starBtn.classList.add('favorited');
+        }
+        starBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (isFavorited(game.key)) {
+            removeFavorite(game.key);
+          } else {
+            addFavorite(game);
+          }
+        };
+
+        btn.append(img, title, starBtn);
+        grid.appendChild(btn);
+      });
+    }
+
+    function filterGames() {
+      if (currentTab === 'all') {
+        const searchValue = document.getElementById("search").value;
+        localStorage.setItem('gamesSearchQuery', searchValue);
+        renderGames(filterCurrentGames());
+      }
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      generateStars();
+      initSplashScreen();
+      loadFavorites();
+      loadGames();
+
+      const savedTab = localStorage.getItem('gamesCurrentTab') || 'all';
+      const savedSearch = localStorage.getItem('gamesSearchQuery') || '';
+      
+      document.getElementById("search").value = savedSearch;
+      
+      if (savedTab === 'favorites') {
+        setTimeout(() => switchTab('favorites'), 3000);
+      }
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9efe76d635b05305',t:'MTc3Njc5NjI3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

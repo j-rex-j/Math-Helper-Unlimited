@@ -1,0 +1,1285 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHI Games Launcher</title>
+  <style>
+        :root {
+            --primary-color-1: #667eea;
+            --primary-color-2: #764ba2;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --light-text: #666;
+            --background-light: #f5f5f5;
+            --border-color: #ddd;
+            --success-color: #4caf50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-color-1) 0%, var(--primary-color-2) 100%);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+        }
+
+        /* Firefox scrollbar */
+        * {
+            scrollbar-color: linear-gradient(135deg, var(--primary-color-1) 0%, var(--primary-color-2) 100%) #f1f1f1;
+            scrollbar-width: thin;
+        }
+
+        @keyframes nebula-shift {
+            0%, 100% { opacity: 1; transform: translate(0, 0); }
+            50% { opacity: 0.8; transform: translate(10px, -10px); }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 1200px 800px at 20% 50%, rgba(138, 43, 226, 0.25) 0%, transparent 50%),
+                radial-gradient(ellipse 1000px 600px at 80% 30%, rgba(30, 144, 255, 0.2) 0%, transparent 50%),
+                radial-gradient(ellipse 800px 700px at 50% 80%, rgba(255, 20, 147, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 900px 650px at 15% 15%, rgba(100, 200, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse 1100px 750px at 85% 70%, rgba(200, 100, 255, 0.12) 0%, transparent 50%);
+            animation: nebula-shift 25s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(1.5px 1.5px at 5% 8%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 12% 18%, #e0e0ff, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 25% 12%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 35% 25%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(1.5px 1.5px at 42% 5%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 55% 35%, #d0e0ff, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 68% 15%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 75% 45%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(1.5px 1.5px at 88% 22%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 92% 60%, #e0e0ff, rgba(255,255,255,0)),
+                radial-gradient(1.5px 1.5px at 18% 72%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 38% 88%, #c0d5ff, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 62% 75%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 78% 82%, #d0e0ff, rgba(255,255,255,0)),
+                radial-gradient(1.5px 1.5px at 8% 55%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 48% 62%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 72% 58%, #e0e0ff, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 15% 38%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 82% 35%, #c0d5ff, rgba(255,255,255,0)),
+                radial-gradient(1.5px 1.5px at 45% 48%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 3% 2%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 8% 42%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 18% 28%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 22% 65%, #ffe0e0, rgba(255,255,255,0)),
+                radial-gradient(1.5px 1.5px at 28% 38%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 32% 72%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 40% 15%, #e0e0ff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 52% 8%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 58% 42%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 65% 28%, #ffc0e0, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 70% 5%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 78% 62%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(1.5px 1.5px at 85% 38%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 90% 15%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 95% 75%, #e0e0ff, rgba(255,255,255,0)),
+                radial-gradient(2px 2px at 10% 92%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 28% 95%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 50% 92%, #ffc0e0, rgba(255,255,255,0)),
+                radial-gradient(1.5px 1.5px at 88% 88%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 2% 15%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 7% 32%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 14% 42%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 19% 58%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 27% 22%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 31% 48%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 39% 68%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 44% 32%, #ffe0e0, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 51% 52%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 59% 18%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 66% 78%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 73% 38%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 81% 72%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 87% 55%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 94% 25%, #ffc0e0, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 6% 65%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 16% 8%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 24% 48%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 33% 62%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 47% 15%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 54% 75%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 61% 45%, #ffe0e0, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 69% 12%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 77% 62%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 84% 18%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 91% 42%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 98% 68%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 11% 78%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 21% 35%, #ffc0e0, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 29% 12%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 36% 82%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 43% 55%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 56% 22%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 64% 68%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 71% 32%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 79% 8%, #ffe0e0, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 86% 78%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 96% 52%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 4% 52%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 13% 95%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 26% 72%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 34% 28%, #fff, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 41% 38%, #ffff99, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 57% 65%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 63% 38%, #ffc0e0, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 74% 75%, #b0d0ff, rgba(255,255,255,0)),
+                radial-gradient(0.6px 0.6px at 80% 48%, #fff, rgba(255,255,255,0)),
+                radial-gradient(1px 1px at 89% 68%, #ffd700, rgba(255,255,255,0)),
+                radial-gradient(0.8px 0.8px at 99% 35%, #fff, rgba(255,255,255,0));
+            background-size: 100% 100%;
+            background-repeat: repeat;
+            animation: twinkle 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Planet orbiting elements */
+        @keyframes orbit-planet-1 {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -80px) rotate(90deg); }
+            50% { transform: translate(0, -120px) rotate(180deg); }
+            75% { transform: translate(-100px, -80px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        @keyframes orbit-planet-2 {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-90px, 60px) rotate(90deg); }
+            50% { transform: translate(0, 100px) rotate(180deg); }
+            75% { transform: translate(90px, 60px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        @keyframes orbit-planet-3 {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(80px, 70px) rotate(90deg); }
+            50% { transform: translate(0, 140px) rotate(180deg); }
+            75% { transform: translate(-80px, 70px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        .planet {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .planet-1 {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 35% 35%, rgba(102, 126, 234, 0.7), rgba(118, 75, 162, 0.6));
+            border-radius: 50%;
+            top: 10%;
+            right: 5%;
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.4), 0 0 40px rgba(102, 126, 234, 0.4);
+            animation: orbit-planet-1 20s linear infinite;
+        }
+
+        .planet-1::before {
+            content: '🎮';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            z-index: 10;
+        }
+
+        .planet-2 {
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 107, 107, 0.6), rgba(200, 50, 70, 0.5));
+            border-radius: 50%;
+            top: 65%;
+            left: 3%;
+            box-shadow: inset -6px -6px 12px rgba(0,0,0,0.5), 0 0 35px rgba(255, 107, 107, 0.3);
+            animation: orbit-planet-2 25s linear infinite;
+        }
+
+        .planet-2::before {
+            content: '⭐';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            z-index: 10;
+        }
+
+        .planet-3 {
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle at 40% 40%, rgba(255, 200, 50, 0.5), rgba(200, 150, 0, 0.4));
+            border-radius: 50%;
+            bottom: 5%;
+            right: 10%;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.4), 0 0 50px rgba(255, 200, 50, 0.3);
+            animation: orbit-planet-3 30s linear infinite;
+        }
+
+        .planet-3::before {
+            content: '🚀';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            z-index: 10;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0);
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--light-text);
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .theme-label {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .theme-preset {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-preset:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-preset.active {
+            border-color: var(--text-color);
+            transform: scale(1.15);
+        }
+
+        .custom-color-inputs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .color-input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .color-input-group label {
+            font-size: 0.85em;
+            color: var(--light-text);
+            min-width: 80px;
+        }
+
+        .color-input-group input {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #searchBox {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        #searchBox:focus {
+            outline: none;
+            border-color: var(--primary-color-1);
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-all-btn {
+            background: linear-gradient(135deg, var(--primary-color-1) 0%, var(--primary-color-2) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .download-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .clear-cache-btn {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .clear-cache-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .storage-info {
+            text-align: center;
+            color: var(--light-text);
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--background-light);
+            border-radius: 8px;
+        }
+
+        .game-count {
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+            place-items: center;
+        }
+
+        .game-button {
+            width: 160px;
+            height: 160px;
+            border: none;
+            border-radius: 50%;
+            font-size: 0.75em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: visible;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.3), var(--primary-color-1));
+            color: white;
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.6), inset -2px -2px 8px rgba(0,0,0,0.3);
+            padding: 15px;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .game-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateZ(25deg);
+            width: 190%;
+            height: 30%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .game-button:hover {
+            transform: scale(1.1) rotateZ(-5deg);
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.8), inset -2px -2px 12px rgba(0,0,0,0.4);
+        }
+
+        .game-button:active {
+            transform: scale(1.05) rotateZ(-5deg);
+        }
+
+        .game-button.downloading {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .game-button.cached::after {
+            content: '✓';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--success-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+        }
+
+        .no-games {
+            text-align: center;
+            color: var(--light-text);
+            padding: 40px;
+            font-size: 1.1em;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--primary-color-1);
+            padding: 20px;
+            font-size: 1.1em;
+        }
+
+        .info {
+            background: #f0f4ff;
+            border-left: 4px solid var(--primary-color-1);
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 5px;
+            color: var(--text-color);
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .info strong {
+            color: var(--primary-color-1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color-1) 0%, var(--primary-color-2) 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="planet planet-1"></div>
+  <div class="planet planet-2"></div>
+  <div class="planet planet-3"></div>
+  <div class="container">
+   <h1>🎮 MHI Games</h1>
+   <p class="subtitle">Select a game to play</p>
+   <div class="search-container">
+    <input type="text" id="searchBox" placeholder="🔍 Search games...">
+   </div>
+   <div class="control-buttons">
+    <button class="control-btn download-all-btn" id="downloadAllBtn">⬇️ Download All Games</button> <button class="control-btn clear-cache-btn" id="clearCacheBtn">🗑️ Clear Cache</button>
+   </div>
+   <div class="storage-info">
+    <span id="storageInfo">Loading storage info...</span>
+   </div>
+   <div class="game-count">
+    <span id="gameCountText">Loading...</span>
+   </div>
+   <div id="gamesContainer" class="games-grid">
+    <div class="loading">
+     Loading games...
+    </div>
+   </div>
+   <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+   </div>
+   <div class="info">
+    <strong>ℹ️ How it works:</strong><br>
+     • Games are downloaded and stored locally on your computer<br>
+     • Click "Download All Games" to cache all games (first time only)<br>
+     • Once cached, games run instantly from your computer<br>
+     • A checkmark (✓) shows which games are downloaded<br>
+     • Use "Clear Cache" to free up space<br>
+     • Internet connection only needed for initial download<br>
+     • 🎨 Customize colors above!
+   </div>
+  </div>
+  <script>
+        // IndexedDB setup for larger storage capacity
+        const DB_NAME = 'MHIGamesDB';
+        const STORE_NAME = 'games';
+        const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/beastcooper/MHI_games/master/offline/';
+
+        let db = null;
+        let filteredGames = [];
+
+        // Theme presets
+        const themes = {
+            default: { color1: '#667eea', color2: '#764ba2', accent: '#ff6b6b' },
+            dark: { color1: '#1a1a2e', color2: '#16213e', accent: '#e94560' },
+            neon: { color1: '#00d4ff', color2: '#ff006e', accent: '#00ff88' },
+            forest: { color1: '#11998e', color2: '#38ef7d', accent: '#ff6b6b' },
+            sunset: { color1: '#ff6b6b', color2: '#ffd93d', accent: '#ff006e' },
+            ocean: { color1: '#0077be', color2: '#00a8e8', accent: '#00c9ff' }
+        };
+
+        // Configuration - All your games with custom emojis and colors
+        const GAMES_LIST = [
+            { name: '1.12', filename: '1.12.html', emoji: '⛏️', color: '#8b7355' },
+            { name: '1.5', filename: '1.5.html', emoji: '🟫', color: '#6b5344' },
+            { name: '1.8', filename: '1.8.html', emoji: '🧱', color: '#a0826d' },
+            { name: '10 Minutes Till Dawn', filename: '10minutestilldawn.html', emoji: '⏰', color: '#ff6600' },
+            { name: '12 Mini Battles', filename: '12minibattles.html', emoji: '🎪', color: '#ff3b30' },
+            { name: '1 on 1 Soccer', filename: '1on1soccer.html', emoji: '⚽', color: '#34c759' },
+            { name: '1 on 1 Tennis', filename: '1on1tennis.html', emoji: '🎾', color: '#ffd700' },
+            { name: '1v1.lol', filename: '1v1.lol.html', emoji: '🔫', color: '#667eea' },
+            { name: '2048', filename: '2048.html', emoji: '🔢', color: '#5ac8fa' },
+            { name: '2048 Cupcakes', filename: '2048cupcakes.html', emoji: '🧁', color: '#ff2d55' },
+            { name: '3D Flight Simulator', filename: '3Dflightsimulator.html', emoji: '✈️', color: '#1e90ff' },
+            { name: '8 Ball Classic', filename: '8ballclassic.html', emoji: '🎱', color: '#212121' },
+            { name: 'Alpha 1.2.6', filename: 'Alpha_1.2.6.html', emoji: 'Α', color: '#667eea' },
+            { name: 'Beta 1.3', filename: 'Beta_1.3.html', emoji: 'Β', color: '#764ba2' },
+            { name: 'Indev', filename: 'Indev.html', emoji: '🚧', color: '#ff9500' },
+            { name: 'Agariolite', filename: 'agariolite.html', emoji: '🟢', color: '#34c759' },
+            { name: 'Age of War', filename: 'ageofwar.html', emoji: '⚔️', color: '#8b4513' },
+            { name: 'Age of War 2', filename: 'ageofwar2.html', emoji: '🗡️', color: '#a52a2a' },
+            { name: 'Ages of Conflict', filename: 'agesofconflict.html', emoji: '⛏️', color: '#696969' },
+            { name: 'Among Us', filename: 'amongus.html', emoji: '👤', color: '#ff3b30' },
+            { name: 'Angry Birds', filename: 'angrybirds.html', emoji: '🐦', color: '#ff6347' },
+            { name: 'Angry Birds Showdown', filename: 'angrybirdsshowdown.html', emoji: '🐤', color: '#ffd700' },
+            { name: 'Angry Birds Space', filename: 'angrybirdsspace.html', emoji: '🚀', color: '#1a1a2e' },
+            { name: 'Awesome Tanks', filename: 'awesometanks.html', emoji: '🛢️', color: '#228b22' },
+            { name: 'Awesome Tanks 2', filename: 'awesometanks2.html', emoji: '🏹', color: '#2f4f4f' },
+            { name: 'Backrooms', filename: 'backrooms.html', emoji: '🚪', color: '#c0c0c0' },
+            { name: 'Bacon May Die', filename: 'baconmaydie.html', emoji: '🥓', color: '#d2691e' },
+            { name: 'Bad Ice Cream', filename: 'badicecream.html', emoji: '🍦', color: '#87ceeb' },
+            { name: 'Bad Ice Cream 2', filename: 'badicecream2.html', emoji: '🧊', color: '#00bfff' },
+            { name: 'Bad Ice Cream 3', filename: 'badicecream3.html', emoji: '🍨', color: '#20b2aa' },
+            { name: 'Bad Parenting', filename: 'badparenting.html', emoji: '🍼', color: '#ffb6c1' },
+            { name: 'Bad Piggies', filename: 'badpiggies.html', emoji: '🐷', color: '#ff69b4' },
+            { name: "Baldi's Basics", filename: 'baldisbasics.html', emoji: '📚', color: '#ff4500' },
+            { name: 'Baseball Bros', filename: 'baseballbros.html', emoji: '⚾', color: '#ff8c00' },
+            { name: 'Basketball Legends', filename: 'basketballlegends.html', emoji: '🏀', color: '#ff6347' },
+            { name: 'Basketball Stars', filename: 'basketballstars.html', emoji: '⭐', color: '#ffd700' },
+            { name: 'Basket Bros', filename: 'basketbros.html', emoji: '🥬', color: '#228b22' },
+            { name: 'Basket Random', filename: 'basketrandom.html', emoji: '🎲', color: '#8b0000' },
+            { name: 'BitLife', filename: 'bitlife.html', emoji: '👶', color: '#667eea' },
+            { name: 'Bit Planes', filename: 'bitplanes.htm', emoji: '🛩️', color: '#1e90ff' },
+            { name: 'Blocky Snakes', filename: 'blockysnakes.html', emoji: '🐍', color: '#32cd32' },
+            { name: 'Bloons TD', filename: 'bloonsTD.html', emoji: '🎈', color: '#ff1493' },
+            { name: 'Bloons TD 2', filename: 'bloonsTD2.html', emoji: '🎪', color: '#ff69b4' },
+            { name: 'Bloons TD 3', filename: 'bloonsTD3.html', emoji: '🧨', color: '#ff4500' },
+            { name: 'Bloons TD 4', filename: 'bloonsTD4.html', emoji: '💣', color: '#8b4513' },
+            { name: 'Bloons TD 5', filename: 'bloonsTD5.html', emoji: '🎯', color: '#4169e1' },
+            { name: 'Bloxorz', filename: 'bloxorz.html', emoji: '📦', color: '#ff8c00' },
+            { name: 'Blumgi Racers', filename: 'blumgiracers.html', emoji: '🏎️', color: '#ff3b30' },
+            { name: 'Blumgi Rocket', filename: 'blumgirocket.html', emoji: '🚀', color: '#ff69b4' },
+            { name: 'Bob the Robber', filename: 'bobtherobber.html', emoji: '🕵️', color: '#2f4f4f' },
+            { name: 'Bob the Robber 2', filename: 'bobtherobber2.html', emoji: '🦹', color: '#1c1c1c' },
+            { name: 'Bob the Robber 5', filename: 'bobtherobber5.html', emoji: '🎭', color: '#696969' },
+            { name: 'Bouncy Motors', filename: 'bouncymotors.html', emoji: '🚙', color: '#1e90ff' },
+            { name: 'Bowmasters', filename: 'bowmasters.html', emoji: '🏹', color: '#8b4513' },
+            { name: 'Boxing Random', filename: 'boxingrandom.htm', emoji: '🥊', color: '#ff0000' },
+            { name: 'Breaking the Bank', filename: 'breakingthebank.html', emoji: '💰', color: '#ffd700' },
+            { name: 'Bubble Shooter', filename: 'bubbleshooter.html', emoji: '🫧', color: '#1e90ff' },
+            { name: 'Candy Crush', filename: 'candycrush.html', emoji: '🍭', color: '#ff69b4' },
+            { name: 'Capybara Clicker', filename: 'capybaraclicker.html', emoji: '🐹', color: '#8b7355' },
+            { name: 'Card Drawing', filename: 'cardrawing.html', emoji: '🃏', color: '#000000' },
+            { name: 'Car King Arena', filename: 'carkingarena.html', emoji: '👑', color: '#ffd700' },
+            { name: 'Chess', filename: 'chess.html', emoji: '♞', color: '#000000' },
+            { name: 'Choppy Orc', filename: 'choppyorc.html', emoji: '🪓', color: '#8b4513' },
+            { name: 'CircloO', filename: 'circloO.html', emoji: '🔴', color: '#ff0000' },
+            { name: 'CircloO 2', filename: 'circloO2.html', emoji: '⭕', color: '#ff6347' },
+            { name: 'Clash of Vikings', filename: 'clashofvikings.html', emoji: '⚔️', color: '#a0826d' },
+            { name: 'Cleanup.io', filename: 'cleanupio.html', emoji: '🧹', color: '#32cd32' },
+            { name: 'Cluster Rush', filename: 'clusterrush.html', emoji: '🌪️', color: '#ff8c00' },
+            { name: 'Cookie Clicker', filename: 'cookieclicker.htm', emoji: '🍪', color: '#a0826d' },
+            { name: 'Crazy Cars', filename: 'crazycars.html', emoji: '🚗', color: '#ff0000' },
+            { name: 'Crazy Cattle 3D', filename: 'crazycattle3D.html', emoji: '🐄', color: '#8b4513' },
+            { name: 'Crazy Crash Landing', filename: 'crazycrashlanding.html', emoji: '💥', color: '#ff4500' },
+            { name: 'Crazy Motorcycle', filename: 'crazymotorcycle.html', emoji: '🏍️', color: '#000000' },
+            { name: 'Crossy Road', filename: 'crossyroad.htm', emoji: '🛣️', color: '#696969' },
+            { name: 'Cut the Rope', filename: 'cuttherope.html', emoji: '✂️', color: '#228b22' },
+            { name: 'Dadish', filename: 'dadish.html', emoji: '🥒', color: '#6b8e23' },
+            { name: 'Dadish 2', filename: 'dadish2.html', emoji: '🥬', color: '#32cd32' },
+            { name: 'Dadish 3', filename: 'dadish3.html', emoji: '🌶️', color: '#ff6347' },
+            { name: 'Death Chase', filename: 'deathchase.html', emoji: '💀', color: '#000000' },
+            { name: 'Death Run 3D', filename: 'deathrun3D.html', emoji: '👻', color: '#696969' },
+            { name: 'Demolition Derby Crash Racing', filename: 'demolitionderbycrashracing.html', emoji: '💥', color: '#ff3b30' },
+            { name: 'Doodle Jump', filename: 'doodlejump.html', emoji: '⬆️', color: '#ffd700' },
+            { name: 'Draw Climber', filename: 'drawclimber.html', emoji: '📐', color: '#667eea' },
+            { name: 'Dread Head Parkour', filename: 'dreadheadparkour.htm', emoji: '🏃', color: '#32cd32' },
+            { name: 'Drift Boss', filename: 'driftboss.htm', emoji: '🏎️', color: '#ff0000' },
+            { name: 'Drive Mad', filename: 'drivemad.htm', emoji: '🚗', color: '#ff1493' },
+            { name: 'Duck Life', filename: 'ducklife.html', emoji: '🦆', color: '#ffd700' },
+            { name: 'Duck Life 2', filename: 'ducklife2.html', emoji: '🦆', color: '#ffb347' },
+            { name: 'Duck Life 3', filename: 'ducklife3.html', emoji: '🦆', color: '#ff8c00' },
+            { name: 'Duck Life 4', filename: 'ducklife4.html', emoji: '🦆', color: '#ff6347' },
+            { name: 'Duck Life 5', filename: 'ducklife5.html', emoji: '🦆', color: '#ff4500' },
+            { name: 'Ducklings.io', filename: 'ducklingsio.html', emoji: '🐥', color: '#ffcc00' },
+            { name: 'Eagle Ride', filename: 'eagleride.html', emoji: '🦅', color: '#8b4513' },
+            { name: 'Earn to Die', filename: 'earntodie.html', emoji: '🧟', color: '#6b4423' },
+            { name: 'Earn to Die 2', filename: 'earntodie2.html', emoji: '🧛', color: '#8b0000' },
+            { name: 'Eggy Car', filename: 'eggycar.html', emoji: '🥚', color: '#fffacd' },
+            { name: 'Elastic Face', filename: 'elasticface.htm', emoji: '😊', color: '#ffd700' },
+            { name: 'Escape Road', filename: 'escaperoad.html', emoji: '🚔', color: '#4169e1' },
+            { name: 'Escape Road 2', filename: 'escaperoad2.html', emoji: '🚨', color: '#ff0000' },
+            { name: 'Escaping the Prison', filename: 'escapingtheprison.html', emoji: '🔓', color: '#2f4f4f' },
+            { name: 'Evil Glitch', filename: 'evilglitch.html', emoji: '👿', color: '#8b0000' },
+            { name: 'Fancy Pants Adventure', filename: 'fancypantsadventure.html', emoji: '👖', color: '#ff1493' },
+            { name: 'Fancy Pants Adventure 2', filename: 'fancypantsadventure2.html', emoji: '🩳', color: '#ff69b4' },
+            { name: 'Fireboy and Watergirl', filename: 'fireboyandwatergirl.html', emoji: '🔥', color: '#ff4500' },
+            { name: 'Fireboy and Watergirl 2', filename: 'fireboyandwatergirl2.html', emoji: '💧', color: '#1e90ff' },
+            { name: 'Fireboy and Watergirl 3', filename: 'fireboyandwatergirl3.html', emoji: '⚡', color: '#ffd700' },
+            { name: 'Fireboy and Watergirl 4', filename: 'fireboyandwatergirl4.html', emoji: '🌊', color: '#00bfff' },
+            { name: 'Flappy Bird', filename: 'flappybird.html', emoji: '🐦', color: '#ff6347' },
+            { name: 'Flood Runner 2', filename: 'floodrunner2.html', emoji: '💨', color: '#1e90ff' },
+            { name: 'Flood Runner 3', filename: 'floodrunner3.html', emoji: '🌊', color: '#00bfff' },
+            { name: 'Flood Runner 4', filename: 'floodrunner4.html', emoji: '⚡', color: '#4169e1' },
+            { name: 'FNAF', filename: 'fnaf.html', emoji: '🐻', color: '#8b4513' },
+            { name: 'FNAF 2', filename: 'fnaf2.html', emoji: '🤖', color: '#696969' },
+            { name: 'FNAF 3', filename: 'fnaf3.html', emoji: '👾', color: '#556b2f' },
+            { name: 'FNAF 4', filename: 'fnaf4.html', emoji: '😱', color: '#000000' },
+            { name: 'Football Bros', filename: 'footballbros.html', emoji: '🏈', color: '#8b4513' },
+            { name: 'Football Legends', filename: 'footballlegends.html', emoji: '⚽', color: '#228b22' },
+            { name: 'Free Rider 3', filename: 'freerider3.html', emoji: '🏍️', color: '#ff3b30' },
+            { name: 'Fruit Ninja', filename: 'fruitninja.html', emoji: '🍎', color: '#ff0000' },
+            { name: 'Funny Battle', filename: 'funnybattle.html', emoji: '😂', color: '#ffd700' },
+            { name: 'Funny Battle 2', filename: 'funnybattle2.html', emoji: '🤣', color: '#ffb347' },
+            { name: 'Funny Mad Racing', filename: 'funnymadracing.html', emoji: '🏎️', color: '#ff1493' },
+            { name: 'Funny Shooter 2', filename: 'funnyshooter2.html', emoji: '🔫', color: '#4169e1' },
+            { name: 'Geometry Dash', filename: 'geometrydash.html', emoji: '🟦', color: '#007aff' },
+            { name: 'Geometry Dash Lite', filename: 'geometrydashlite.html', emoji: '▲', color: '#ff1493' },
+            { name: 'Geometry Vibes', filename: 'geometryvibes.html', emoji: '◆', color: '#5ac8fa' },
+            { name: 'Get Away Shootout', filename: 'getawayshootout.htm', emoji: '💨', color: '#ff3b30' },
+            { name: 'Get on Top', filename: 'getontop.html', emoji: '🪜', color: '#228b22' },
+            { name: 'Gladi Hoppers', filename: 'gladihoppers.html', emoji: '🦗', color: '#556b2f' },
+            { name: 'Google Baseball', filename: 'googlebaseball.html', emoji: '⚾', color: '#ff8c00' },
+            { name: 'Google Dino', filename: 'googledino.html', emoji: '🦖', color: '#6b4423' },
+            { name: 'Granny', filename: 'granny.html', emoji: '👵', color: '#696969' },
+            { name: 'Granny 2', filename: 'granny2.html', emoji: '🧓', color: '#808080' },
+            { name: 'Guess Their Answer', filename: 'guesstheiranswer.html', emoji: '🤔', color: '#667eea' },
+            { name: 'Hanger 2', filename: 'hanger2.html', emoji: '🪂', color: '#ff8c00' },
+            { name: 'Happy Wheels', filename: 'happywheels.html', emoji: '🚲', color: '#228b22' },
+            { name: 'Helix Jump', filename: 'helixjump.html', emoji: '🌀', color: '#667eea' },
+            { name: 'Highway Traffic', filename: 'highwaytraffic.html', emoji: '🚗', color: '#ff0000' },
+            { name: 'Hill Climb Racing Lite', filename: 'hillclimbracinglite.html', emoji: '⛰️', color: '#8b4513' },
+            { name: 'Hole.io', filename: 'holeio.html', emoji: '🕳️', color: '#000000' },
+            { name: 'House of Hazards', filename: 'houseofhazards.html', emoji: '🏚️', color: '#ff1493' },
+            { name: 'Hover Racer Drive', filename: 'hoverracerdrive.html', emoji: '🚀', color: '#1e90ff' },
+            { name: 'Idle Breakout', filename: 'idlebreakout.html', emoji: '💥', color: '#ff8c00' },
+            { name: 'Iron Snout', filename: 'ironsnout.html', emoji: '🐷', color: '#000000' },
+            { name: 'Jetpack Joyride', filename: 'jetpackjoyride.html', emoji: '🚀', color: '#ff6347' },
+            { name: 'Johnny Trigger', filename: 'johnnytrigger.html', emoji: '🔫', color: '#2f4f4f' },
+            { name: 'Jumping Shell', filename: 'jumpingshell.html', emoji: '🐚', color: '#ff8c00' },
+            { name: 'Karate Bros', filename: 'karatebros.html', emoji: '🥋', color: '#8b0000' },
+            { name: 'Kart Bros', filename: 'kartbros.html', emoji: '🏎️', color: '#ff0000' },
+            { name: 'Learn to Fly', filename: 'learntofly.html', emoji: '🐧', color: '#1e90ff' },
+            { name: 'Learn to Fly 2', filename: 'learntofly2.html', emoji: '🐦', color: '#ff6347' },
+            { name: 'Learn to Fly 3', filename: 'learntofly3.html', emoji: '🦅', color: '#8b4513' },
+            { name: 'Learn to Fly Idle', filename: 'learntoflyidle.html', emoji: '✈️', color: '#4169e1' },
+            { name: 'Level Devil', filename: 'leveldevil.html', emoji: '😈', color: '#8b0000' },
+            { name: 'Madalin Stunt Cars 2', filename: 'madalinstuntcars2.html', emoji: '🏎️', color: '#ff0000' },
+            { name: 'Melon Playground', filename: 'melonplayground.html', emoji: '🍈', color: '#228b22' },
+            { name: 'Merge Round Racers', filename: 'mergeroundracers.html', emoji: '♻️', color: '#1e90ff' },
+            { name: 'Minesweeper', filename: 'minesweeper.html', emoji: '💣', color: '#ff0000' },
+            { name: 'Monkey Mart', filename: 'monkeymart.htm', emoji: '🐵', color: '#8b4513' },
+            { name: 'Monster Tracks', filename: 'monstertracks.html', emoji: '👹', color: '#32cd32' },
+            { name: 'Moto X3M', filename: 'motox3m.htm', emoji: '🏍️', color: '#ff3b30' },
+            { name: 'Moto X3M 2', filename: 'motox3m2.html', emoji: '🏍️', color: '#ff1493' },
+            { name: 'Moto X3M 3', filename: 'motox3m3.html', emoji: '🏍️', color: '#ff8c00' },
+            { name: 'Moto X3M Pool Party', filename: 'motox3mpoolparty.html', emoji: '🏍️', color: '#1e90ff' },
+            { name: 'Moto X3M Spooky Land', filename: 'motox3mspookyland.html', emoji: '🏍️', color: '#8b008b' },
+            { name: 'Moto X3M Winter', filename: 'motox3mwinter.html', emoji: '🏍️', color: '#00bfff' },
+            { name: 'Noob Miner', filename: 'noobminer.html', emoji: '⛏️', color: '#8b4513' },
+            { name: 'Opposite Day', filename: 'oppositeday.html', emoji: '🔄', color: '#667eea' },
+            { name: 'OvO', filename: 'ovo.html', emoji: '🥚', color: '#fffacd' },
+            { name: 'OvO 2', filename: 'ovo2.html', emoji: '🥚', color: '#ffd700' },
+            { name: 'OvO 3D', filename: 'ovo3dimensions.html', emoji: '🥚', color: '#ff8c00' },
+            { name: 'Pac-Man', filename: 'pacman.html', emoji: '👾', color: '#ffcc00' },
+            { name: "Papa's Bakeria", filename: 'papasbakeria.html', emoji: '🍞', color: '#d2691e' },
+            { name: "Papa's Burgeria", filename: 'papasburgeria.html', emoji: '🍔', color: '#8b4513' },
+            { name: "Papa's Cheeseria", filename: 'papascheeseria.html', emoji: '🧀', color: '#ffd700' },
+            { name: "Papa's Cupcakeria", filename: 'papascupcakeria.html', emoji: '🧁', color: '#ff69b4' },
+            { name: "Papa's Donuteria", filename: 'papasdonuteria.html', emoji: '🍩', color: '#a0826d' },
+            { name: "Papa's Freezeria", filename: 'papasfreezeria.html', emoji: '🍦', color: '#1e90ff' },
+            { name: "Papa's Hot Doggeria", filename: 'papashotdoggeria.html', emoji: '🌭', color: '#ff8c00' },
+            { name: "Papa's Pancakeria", filename: 'papaspancakeria.html', emoji: '🥞', color: '#daa520' },
+            { name: "Papa's Pastaria", filename: 'papaspastaria.html', emoji: '🍝', color: '#ff6347' },
+            { name: "Papa's Pizzeria", filename: 'papaspizzeria.html', emoji: '🍕', color: '#ff4500' },
+            { name: "Papa's Scooperia", filename: 'papasscooperia.html', emoji: '🍨', color: '#ff1493' },
+            { name: "Papa's Sushiria", filename: 'papassushiria.html', emoji: '🍣', color: '#ff0000' },
+            { name: "Papa's Tacomia", filename: 'papastacomia.html', emoji: '🌮', color: '#ff6347' },
+            { name: "Papa's Wingeria", filename: 'papaswingeria.html', emoji: '🍗', color: '#ff8c00' },
+            { name: 'Paper.io 2', filename: 'paperio2.htm', emoji: '📄', color: '#667eea' },
+            { name: 'Parking Fury', filename: 'parkingfury.html', emoji: '🅿️', color: '#1e90ff' },
+            { name: 'Parking Fury 2', filename: 'parkingfury2.html', emoji: '🅿️', color: '#4169e1' },
+            { name: 'Parking Fury 3', filename: 'parkingfury3.html', emoji: '🅿️', color: '#0000cd' },
+            { name: "Pico's School", filename: 'picosschool.html', emoji: '🏫', color: '#8b4513' },
+            { name: 'Ping Pong Chaos', filename: 'pingpongchaos.html', emoji: '🏓', color: '#ffffff' },
+            { name: 'Pixel Speedrun', filename: 'pixelspeedrun.html', emoji: '⏱️', color: '#ff0000' },
+            { name: 'Plants vs Zombies', filename: 'plantsvszombies.html', emoji: '🌿', color: '#228b22' },
+            { name: 'Plonky', filename: 'plonky.html', emoji: '🎹', color: '#1e90ff' },
+            { name: 'Polytrack', filename: 'polytrack.html', emoji: '🌈', color: '#667eea' },
+            { name: 'Poor Bunny', filename: 'poorbunny.html', emoji: '🐰', color: '#32cd32' },
+            { name: 'Pou', filename: 'pou.html', emoji: '👾', color: '#ffd700' },
+            { name: 'Ragdoll Archers', filename: 'ragdollarchers.htm', emoji: '🏹', color: '#8b4513' },
+            { name: 'Ragdoll Hit', filename: 'ragdollhit.html', emoji: '👊', color: '#ff0000' },
+            { name: 'Ragdoll Soccer', filename: 'ragdollsoccer.html', emoji: '⚽', color: '#228b22' },
+            { name: 'Red Ball 4 Vol 1', filename: 'redball4vol1.html', emoji: '🔴', color: '#ff0000' },
+            { name: 'Red Ball 4 Vol 2', filename: 'redball4vol2.html', emoji: '🔴', color: '#ff1493' },
+            { name: 'Red Ball 4 Vol 3', filename: 'redball4vol3.html', emoji: '🔴', color: '#ff4500' },
+            { name: 'Retro Bowl', filename: 'retrobowl.html', emoji: '🏈', color: '#8b4513' },
+            { name: 'Retro Bowl College', filename: 'retrobowlcollege.html', emoji: '🏟️', color: '#a0826d' },
+            { name: 'Retro Highway', filename: 'retrohighway.html', emoji: '🛣️', color: '#ff8c00' },
+            { name: 'Retro Ping Pong', filename: 'retropingpong.html', emoji: '🏓', color: '#ffd700' },
+            { name: 'Riddle School', filename: 'riddleschool.html', emoji: '🏫', color: '#ff6347' },
+            { name: 'Riddle School 2', filename: 'riddleschool2.html', emoji: '🏫', color: '#ff8c00' },
+            { name: 'Riddle School 3', filename: 'riddleschool3.html', emoji: '🏫', color: '#ffd700' },
+            { name: 'Riddle School 4', filename: 'riddleschool4.html', emoji: '🏫', color: '#228b22' },
+            { name: 'Riddle School 5', filename: 'riddleschool5.html', emoji: '🏫', color: '#1e90ff' },
+            { name: 'Riddle Transfer', filename: 'riddletransfer.html', emoji: '✨', color: '#667eea' },
+            { name: 'Riddle Transfer 2', filename: 'riddletransfer2.html', emoji: '🌟', color: '#ffd700' },
+          { name: 'Lunch Runners 3d', filename: 'LunchRunners3d.html', emoji: '🌟', color: '#ffd700' },
+            { name: 'Rocket Soccer Derby', filename: 'rocketsoccerderby.html', emoji: '🚀', color: '#ff0000' },
+            { name: 'Rooftop Snipers', filename: 'rooftopsnipers.htm', emoji: '🔫', color: '#000000' },
+            { name: 'Rooftop Snipers 2', filename: 'rooftopsnipers2.html', emoji: '🔫', color: '#696969' },
+            { name: 'Run', filename: 'run.html', emoji: '🏃', color: '#667eea' },
+            { name: 'Run 2', filename: 'run2.html', emoji: '🏃', color: '#1e90ff' },
+            { name: 'Run 3', filename: 'run3.html', emoji: '🏃', color: '#228b22' },
+            { name: 'Sand Game', filename: 'sandgame.html', emoji: '🏜️', color: '#cd853f' },
+            { name: 'Short Life', filename: 'shortlife.html', emoji: '⏳', color: '#ff0000' },
+            { name: 'Slope', filename: 'slope.html', emoji: '⛷️', color: '#ff3b30' },
+            { name: 'Slope 2 Player', filename: 'slope2player.html', emoji: '⛷️', color: '#ff1493' },
+            { name: 'Slope 3', filename: 'slope3.html', emoji: '⛷️', color: '#ff8c00' },
+            { name: 'Slow Roads', filename: 'slowroads.html', emoji: '🚗', color: '#667eea' },
+            { name: 'SM63', filename: 'sm63.html', emoji: '🧑', color: '#ff0000' },
+            { name: 'SM64', filename: 'sm64.html', emoji: '👨', color: '#ff6347' },
+            { name: 'Snowball.io', filename: 'snowballio.html', emoji: '⛄', color: '#1e90ff' },
+            { name: 'Snow Rider', filename: 'snowrider.htm', emoji: '🏂', color: '#00bfff' },
+            { name: 'Snow Road', filename: 'snowroad.htm', emoji: '❄️', color: '#b0e0e6' },
+            { name: 'Soccer Bros', filename: 'soccerbros.html', emoji: '⚽', color: '#228b22' },
+            { name: 'Soccer Random', filename: 'soccerrandom.htm', emoji: '⚽', color: '#32cd32' },
+            { name: 'Space Bar Clicker', filename: 'spacebarclicker.html', emoji: '⌨️', color: '#000000' },
+            { name: 'Space is Key', filename: 'spaceiskey.html', emoji: '🚀', color: '#1a1a2e' },
+            { name: 'Space is Key 2', filename: 'spaceiskey2.html', emoji: '🛸', color: '#0f3460' },
+            { name: 'Space Waves', filename: 'spacewaves.html', emoji: '🌊', color: '#1e90ff' },
+            { name: 'Speed Stars', filename: 'speedstars.html', emoji: '⭐', color: '#ffd700' },
+            { name: 'Sprunki', filename: 'sprunki.html', emoji: '🎵', color: '#667eea' },
+            { name: 'Stack', filename: 'stack.html', emoji: '📦', color: '#ff8c00' },
+            { name: 'StackTris', filename: 'stacktris.html', emoji: '⬜', color: '#667eea' },
+            { name: 'State.io', filename: 'stateio.html', emoji: '🗺️', color: '#228b22' },
+            { name: 'Stick Archers Battle', filename: 'stickarchersbattle.html', emoji: '🏹', color: '#8b4513' },
+            { name: 'Stick Fighter', filename: 'stickfighter.html', emoji: '👊', color: '#ff0000' },
+            { name: 'Stick Man Hook', filename: 'stickmanhook.html', emoji: '🪝', color: '#ff8c00' },
+            { name: 'Stick Merge', filename: 'stickmerge.html', emoji: '🎯', color: '#667eea' },
+            { name: 'Subway Surfers Beijing', filename: 'subwaysurfersbeijing.html', emoji: '🚇', color: '#ff0000' },
+            { name: 'Subway Surfers Havana', filename: 'subwaysurfershavana.html', emoji: '🚇', color: '#ff8c00' },
+            { name: 'Subway Surfers San Francisco', filename: 'subwaysurferssanfrancisco.html', emoji: '🚇', color: '#ffd700' },
+            { name: 'Super Bike The Champion', filename: 'superbikethechampion.html', emoji: '🏍️', color: '#ff0000' },
+            { name: 'Superhot', filename: 'superhot.html', emoji: '🔥', color: '#ff0000' },
+            { name: 'Super Liquid Soccer', filename: 'superliquidsoccer.html', emoji: '⚽', color: '#1e90ff' },
+            { name: 'Superstar Car', filename: 'superstarcar.html', emoji: '🏆', color: '#ffd700' },
+            { name: 'Table Tennis World Tour', filename: 'tabletennisworldtour.html', emoji: '🏓', color: '#ff6347' },
+            { name: 'Tag', filename: 'tag.html', emoji: '🏃', color: '#ff0000' },
+            { name: 'Tap Road', filename: 'taproad.html', emoji: '🛣️', color: '#667eea' },
+            { name: 'Temple of Boom', filename: 'templeofboom.html', emoji: '🏛️', color: '#daa520' },
+            { name: 'Temple Run 2', filename: 'templerun2.htm', emoji: '🏃', color: '#ff0000' },
+            { name: 'Territorial.io', filename: 'territorialio.html', emoji: '🗺️', color: '#32cd32' },
+            { name: 'The Impossible Quiz', filename: 'theimpossiblequiz.html', emoji: '❓', color: '#667eea' },
+            { name: 'The Impossible Quiz 2', filename: 'theimpossiblequiz2.html', emoji: '❔', color: '#ffd700' },
+            { name: 'There is No G', filename: 'thereisnog.html', emoji: '🅰️', color: '#1e90ff' },
+            { name: 'They Are Coming', filename: 'theyarecoming.html', emoji: '👾', color: '#228b22' },
+            { name: 'This is the Only Level', filename: 'thisistheonlylevel.html', emoji: '🎮', color: '#667eea' },
+            { name: 'This is the Only Level Too', filename: 'thisistheonlyleveltoo.html', emoji: '🕹️', color: '#ff0000' },
+            { name: 'Time Shooter 2', filename: 'timeshooter2.html', emoji: '⏱️', color: '#ff0000' },
+            { name: 'Time Shooter 3', filename: 'timeshooter3.htm', emoji: '⏰', color: '#ff1493' },
+            { name: 'Tiny Fishing', filename: 'tinyfishing.html', emoji: '🎣', color: '#1e90ff' },
+            { name: 'Tomb of the Mask', filename: 'tombofthemask.htm', emoji: '🪦', color: '#696969' },
+            { name: 'Trap the Cat', filename: 'trapthecat.html', emoji: '🐱', color: '#32cd32' },
+            { name: 'Trivia Crack', filename: 'triviacrack.html', emoji: '🧠', color: '#ff0000' },
+            { name: 'Tube Jumpers', filename: 'tubejumpers.html', emoji: '🚇', color: '#ff8c00' },
+            { name: 'Tunnel Rush', filename: 'tunnelrush.html', emoji: '🌀', color: '#667eea' },
+            { name: 'Unicycle Hero', filename: 'unicyclehero.html', emoji: '🚲', color: '#ff8c00' },
+            { name: 'Vex 4', filename: 'vex4.html', emoji: '▪️', color: '#ff0000' },
+            { name: 'Vex 5', filename: 'vex5.html', emoji: '▪️', color: '#ff1493' },
+            { name: 'Vex 6', filename: 'vex6.htm', emoji: '▪️', color: '#ff8c00' },
+            { name: 'Vex 7', filename: 'vex7.htm', emoji: '▪️', color: '#ffd700' },
+            { name: 'Vex 8', filename: 'vex8.htm', emoji: '▪️', color: '#228b22' },
+            { name: 'Vexx 3M', filename: 'vexx3m.html', emoji: '🏍️', color: '#ff0000' },
+            { name: 'Vexx 3M 2', filename: 'vexx3m2.html', emoji: '🏍️', color: '#ff1493' },
+            { name: 'Volley Random', filename: 'volleyrandom.html', emoji: '🏐', color: '#ffd700' },
+            { name: 'War the Knights', filename: 'wartheknights.html', emoji: '⚔️', color: '#8b4513' },
+            { name: 'We Become What We Behold', filename: 'webecomewhatwebehold.html', emoji: '👁️', color: '#000000' },
+            { name: 'Wheelie Bike', filename: 'wheeliebike.html', emoji: '🚲', color: '#ff0000' },
+            { name: 'Wheely', filename: 'wheely.html', emoji: '🚗', color: '#1e90ff' },
+            { name: 'Wheely 2', filename: 'wheely2.html', emoji: '🚗', color: '#4169e1' },
+            { name: 'Wheely 3', filename: 'wheely3.html', emoji: '🚗', color: '#6495ed' },
+            { name: 'Wheely 4', filename: 'wheely4.html', emoji: '🚗', color: '#87ceeb' },
+            { name: 'Wheely 5', filename: 'wheely5.html', emoji: '🚗', color: '#00bfff' },
+            { name: 'Wheely 6', filename: 'wheely6.html', emoji: '🚗', color: '#1e90ff' },
+            { name: 'Wheely 7', filename: 'wheely7.html', emoji: '🚗', color: '#0000cd' },
+            { name: 'Wheely 8', filename: 'wheely8.html', emoji: '🚗', color: '#0000ff' },
+            { name: 'Wordle Unlimited', filename: 'wordleunlimited.html', emoji: '📝', color: '#32cd32' },
+            { name: "World's Hardest Game", filename: 'worldshardestgame.html', emoji: '🎮', color: '#ff0000' },
+            { name: "World's Hardest Game 2", filename: 'worldshardestgame2.html', emoji: '🎮', color: '#ff1493' },
+            { name: "World's Hardest Game 3", filename: 'worldshardestgame3.html', emoji: '🎮', color: '#ff8c00' },
+            { name: 'Wrestle Bros', filename: 'wrestlebros.html', emoji: '🤼', color: '#ff0000' },
+            { name: 'Zombie Rush', filename: 'zombierush.html', emoji: '🧟', color: '#228b22' },
+        ];
+
+        // Apply theme
+        function applyTheme(color1, color2, accent) {
+            document.documentElement.style.setProperty('--primary-color-1', color1);
+            document.documentElement.style.setProperty('--primary-color-2', color2);
+            document.documentElement.style.setProperty('--accent-color', accent);
+            
+            // Save to localStorage
+            localStorage.setItem('mhiTheme', JSON.stringify({ color1, color2, accent }));
+        }
+
+        // Load saved theme
+        function loadSavedTheme() {
+            const saved = localStorage.getItem('mhiTheme');
+            if (saved) {
+                const { color1, color2, accent } = JSON.parse(saved);
+                applyTheme(color1, color2, accent);
+            }
+        }
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains(STORE_NAME)) {
+                        database.createObjectStore(STORE_NAME, { keyPath: 'filename' });
+                    }
+                };
+            });
+        }
+
+        // Get game from storage
+        function getGameFromStorage(filename) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get(filename);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+            });
+        }
+
+        // Save game to storage
+        function saveGameToStorage(filename, htmlContent) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put({ filename, content: htmlContent, timestamp: Date.now() });
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve();
+            });
+        }
+
+        // Check if game is cached
+        async function isGameCached(filename) {
+            const game = await getGameFromStorage(filename);
+            return !!game;
+        }
+
+        // Get storage size
+        function getStorageSize() {
+            return new Promise((resolve, reject) => {
+                if (navigator.storage && navigator.storage.estimate) {
+                    navigator.storage.estimate().then(estimate => {
+                        const usedMB = (estimate.usage / 1024 / 1024).toFixed(2);
+                        const quotaMB = (estimate.quota / 1024 / 1024).toFixed(2);
+                        resolve({ used: usedMB, quota: quotaMB });
+                    }).catch(reject);
+                } else {
+                    resolve({ used: '?', quota: '?' });
+                }
+            });
+        }
+
+        // Update storage info
+        async function updateStorageInfo() {
+            try {
+                const size = await getStorageSize();
+                document.getElementById('storageInfo').textContent = 
+                    `Storage: ${size.used} MB / ${size.quota} MB used`;
+            } catch (error) {
+                console.error('Error getting storage info:', error);
+            }
+        }
+
+        // Open game
+        async function openGame(gameName, filename) {
+            try {
+                let htmlContent = null;
+                
+                const cached = await getGameFromStorage(filename);
+                if (cached) {
+                    htmlContent = cached.content;
+                } else {
+                    const response = await fetch(GITHUB_RAW_URL + filename);
+                    if (!response.ok) {
+                        throw new Error(`Failed to load ${filename}`);
+                    }
+                    htmlContent = await response.text();
+                    await saveGameToStorage(filename, htmlContent);
+                }
+
+                const newWindow = window.open('', '_blank');
+                if (!newWindow) {
+                    throw new Error('Failed to open window. Disable popup blocker.');
+                }
+                
+                newWindow.document.open();
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+                newWindow.document.title = gameName + ' - MHI Games';
+
+                await renderGames();
+                
+            } catch (error) {
+                console.error('Error opening game:', error);
+                alert(`⚠️ Failed to load ${gameName}\n\nError: ${error.message}`);
+            }
+        }
+
+        // Download all games
+        async function downloadAllGames() {
+            const downloadBtn = document.getElementById('downloadAllBtn');
+            const progressFill = document.getElementById('progressFill');
+            
+            downloadBtn.disabled = true;
+            downloadBtn.textContent = '⬇️ Downloading...';
+            
+            let successCount = 0;
+            const total = GAMES_LIST.length;
+            
+            for (let i = 0; i < GAMES_LIST.length; i++) {
+                const game = GAMES_LIST[i];
+                try {
+                    const cached = await getGameFromStorage(game.filename);
+                    if (!cached) {
+                        const response = await fetch(GITHUB_RAW_URL + game.filename);
+                        if (response.ok) {
+                            const htmlContent = await response.text();
+                            await saveGameToStorage(game.filename, htmlContent);
+                            successCount++;
+                        }
+                    } else {
+                        successCount++;
+                    }
+                } catch (error) {
+                    console.error(`Failed to download ${game.name}:`, error);
+                }
+                
+                const progress = ((i + 1) / total) * 100;
+                progressFill.style.width = progress + '%';
+            }
+            
+            downloadBtn.disabled = false;
+            downloadBtn.textContent = `✅ Downloaded ${successCount}/${total} Games`;
+            
+            await updateStorageInfo();
+            await renderGames();
+            
+            setTimeout(() => {
+                downloadBtn.textContent = '⬇️ Download All Games';
+            }, 3000);
+        }
+
+        // Clear cache
+        async function clearCache() {
+            if (confirm('Are you sure you want to delete all cached games?')) {
+                try {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    store.clear();
+                    
+                    await new Promise((resolve, reject) => {
+                        transaction.oncomplete = resolve;
+                        transaction.onerror = reject;
+                    });
+                    
+                    alert('✅ Cache cleared!');
+                    await updateStorageInfo();
+                    await renderGames();
+                } catch (error) {
+                    alert('❌ Error clearing cache: ' + error.message);
+                }
+            }
+        }
+
+        // Search games
+        function filterGames(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            
+            if (term === '') {
+                filteredGames = [...GAMES_LIST];
+            } else {
+                filteredGames = GAMES_LIST.filter(game => 
+                    game.name.toLowerCase().includes(term)
+                );
+            }
+            
+            renderGames();
+        }
+
+        // Render games
+        async function renderGames() {
+            const container = document.getElementById('gamesContainer');
+            const countText = document.getElementById('gameCountText');
+            
+            if (filteredGames.length === 0) {
+                container.innerHTML = `
+                    <div class="no-games" style="grid-column: 1 / -1;">
+                        No games found. Try a different search!
+                    </div>
+                `;
+                countText.textContent = 'No games found';
+                return;
+            }
+
+            container.innerHTML = '';
+            countText.textContent = `Showing ${filteredGames.length} of ${GAMES_LIST.length} games`;
+            
+            for (const game of filteredGames) {
+                const button = document.createElement('button');
+                button.className = 'game-button';
+                button.innerHTML = `<div style="font-size: 3em; margin-bottom: 8px;">${game.emoji}</div><div>${game.name}</div>`;
+                button.style.background = `radial-gradient(circle at 35% 35%, rgba(255,255,255,0.3), ${game.color})`;
+                button.style.boxShadow = `0 0 30px ${game.color}80, inset -2px -2px 8px rgba(0,0,0,0.3)`;
+                
+                const isCached = await isGameCached(game.filename);
+                if (isCached) {
+                    button.classList.add('cached');
+                }
+                
+                button.onclick = () => {
+                    openGame(game.name, game.filename);
+                };
+                button.title = isCached ? 
+                    `Click to play ${game.name} (cached)` : 
+                    `Click to play ${game.name} (will download)`;
+                
+                container.appendChild(button);
+            }
+        }
+
+        // Initialize
+        async function init() {
+            try {
+                // Load saved theme first
+                loadSavedTheme();
+                
+                await initDB();
+                filteredGames = [...GAMES_LIST];
+                await renderGames();
+                await updateStorageInfo();
+                
+                // Setup search box
+                const searchBox = document.getElementById('searchBox');
+                searchBox.addEventListener('input', (e) => {
+                    filterGames(e.target.value);
+                });
+
+                // Setup buttons
+                document.getElementById('downloadAllBtn').addEventListener('click', downloadAllGames);
+                document.getElementById('clearCacheBtn').addEventListener('click', clearCache);
+
+                // Setup theme presets
+                document.getElementById('themeDefault').addEventListener('click', () => {
+                    applyTheme(themes.default.color1, themes.default.color2, themes.default.accent);
+                    updateThemeButtons('themeDefault');
+                });
+                document.getElementById('themeDark').addEventListener('click', () => {
+                    applyTheme(themes.dark.color1, themes.dark.color2, themes.dark.accent);
+                    updateThemeButtons('themeDark');
+                });
+                document.getElementById('themeNeon').addEventListener('click', () => {
+                    applyTheme(themes.neon.color1, themes.neon.color2, themes.neon.accent);
+                    updateThemeButtons('themeNeon');
+                });
+                document.getElementById('themeForest').addEventListener('click', () => {
+                    applyTheme(themes.forest.color1, themes.forest.color2, themes.forest.accent);
+                    updateThemeButtons('themeForest');
+                });
+                document.getElementById('themeSunset').addEventListener('click', () => {
+                    applyTheme(themes.sunset.color1, themes.sunset.color2, themes.sunset.accent);
+                    updateThemeButtons('themeSunset');
+                });
+                document.getElementById('themeOcean').addEventListener('click', () => {
+                    applyTheme(themes.ocean.color1, themes.ocean.color2, themes.ocean.accent);
+                    updateThemeButtons('themeOcean');
+                });
+
+                // Setup custom color inputs
+                document.getElementById('customColor1').addEventListener('input', (e) => {
+                    const color1 = e.target.value;
+                    const color2 = document.getElementById('customColor2').value;
+                    const accent = document.getElementById('customAccent').value;
+                    applyTheme(color1, color2, accent);
+                    updateThemeButtons(null);
+                });
+                document.getElementById('customColor2').addEventListener('input', (e) => {
+                    const color1 = document.getElementById('customColor1').value;
+                    const color2 = e.target.value;
+                    const accent = document.getElementById('customAccent').value;
+                    applyTheme(color1, color2, accent);
+                    updateThemeButtons(null);
+                });
+                document.getElementById('customAccent').addEventListener('input', (e) => {
+                    const color1 = document.getElementById('customColor1').value;
+                    const color2 = document.getElementById('customColor2').value;
+                    const accent = e.target.value;
+                    applyTheme(color1, color2, accent);
+                    updateThemeButtons(null);
+                });
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                alert('Error initializing launcher: ' + error.message);
+            }
+        }
+
+        function updateThemeButtons(activeId) {
+            document.querySelectorAll('.theme-preset').forEach(preset => {
+                preset.classList.remove('active');
+            });
+            if (activeId) {
+                document.getElementById(activeId).classList.add('active');
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e58ecb826d56a05',t:'MTc3NTA2MDQ2My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
